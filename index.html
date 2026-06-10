@@ -1,308 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Bolão dos Amigos 2026</title>
-
-<style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family: Arial, Helvetica, sans-serif;
-    background:#f5f7fa;
-    color:#333;
-}
-
-.container{
-    max-width:900px;
-    margin:auto;
-    padding:20px;
-}
-
-.header{
-    text-align:center;
-    margin-bottom:30px;
-}
-
-.header h1{
-    color:#0d6efd;
-    margin-bottom:10px;
-}
-
-.header p{
-    color:#666;
-}
-
-.card{
-    background:white;
-    border-radius:12px;
-    box-shadow:0 2px 10px rgba(0,0,0,.08);
-    overflow:hidden;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-thead{
-    background:#0d6efd;
-    color:white;
-}
-
-th{
-    padding:15px;
-    text-align:left;
-}
-
-td{
-    padding:14px;
-    border-bottom:1px solid #eee;
-}
-
-tbody tr:hover{
-    background:#f8f9ff;
-}
-
-.posicao{
-    width:80px;
-    text-align:center;
-    font-weight:bold;
-}
-
-.pontos{
-    width:100px;
-    text-align:center;
-    font-weight:bold;
-}
-
-.loading-container{
-    padding:60px;
-    text-align:center;
-}
-
-.spinner{
-    width:60px;
-    height:60px;
-    border:6px solid #e5e5e5;
-    border-top:6px solid #0d6efd;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
-    margin:auto;
-}
-
-.loading-text{
-    margin-top:20px;
-    color:#666;
-}
-
-.erro{
-    color:red;
-    text-align:center;
-    padding:40px;
-}
-
-.footer{
-    text-align:center;
-    margin-top:20px;
-    color:#666;
-    font-size:14px;
-}
-
-.lider{
-    background:#fff9db !important;
-    font-weight:bold;
-}
-
-.medalha{
-    font-size:22px;
-}
-
-@keyframes spin{
-    0%{
-        transform:rotate(0deg);
-    }
-    100%{
-        transform:rotate(360deg);
-    }
-}
-
-@media(max-width:600px){
-
-    th,
-    td{
-        padding:10px;
-        font-size:14px;
-    }
-
-    .header h1{
-        font-size:24px;
-    }
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolão Copa 2026</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+
+<div id="loading" class="loading">
+    Carregando classificação...
+</div>
 
 <div class="container">
 
-    <div class="header">
-        <h1>🏆 Bolão dos Amigos 2026</h1>
-        <p>Classificação atualizada automaticamente</p>
-    </div>
+    <h1>🏆 Classificação do Bolão</h1>
 
-    <div class="card">
-
-        <div id="loading" class="loading-container">
-            <div class="spinner"></div>
-            <div class="loading-text">
-                Carregando classificação...
-            </div>
-        </div>
-
-        <div id="erro" class="erro" style="display:none;">
-        </div>
-
-        <table id="tabelaRanking" style="display:none;">
-            <thead>
-                <tr>
-                    <th>Posição</th>
-                    <th>Participante</th>
-                    <th>Pontos</th>
-                </tr>
-            </thead>
-
-            <tbody id="ranking"></tbody>
-        </table>
-
-    </div>
-
-    <div class="footer">
-        Última atualização: <span id="ultimaAtualizacao">--</span>
-    </div>
+    <table id="rankingTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Participante</th>
+                <th>Pontos</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
 </div>
 
-<script>
-
-// COLE A URL DO APPS SCRIPT AQUI
-const URL = "https://script.google.com/macros/s/AKfycbzr94hkk94XHTH_DCqGgonglSi9FGUg5WLC0UJgQi-cMpKlS8wCeKspvvRLoGhcNlH0EA/exec";
-
-async function carregarRanking(){
-
-    const loading =
-        document.getElementById("loading");
-
-    const tabela =
-        document.getElementById("tabelaRanking");
-
-    const erro =
-        document.getElementById("erro");
-
-    try{
-
-        erro.style.display = "none";
-
-        const resposta = await fetch(
-            URL + "?t=" + Date.now()
-        );
-
-        if(!resposta.ok){
-            throw new Error("Erro ao acessar a planilha");
-        }
-
-        const dados =
-            await resposta.json();
-
-        dados.sort(
-            (a,b) =>
-            Number(b.pontos) -
-            Number(a.pontos)
-        );
-
-        const tbody =
-            document.getElementById("ranking");
-
-        tbody.innerHTML = "";
-
-        dados.forEach((item,index)=>{
-
-            let medalha = "";
-
-            if(index === 0)
-                medalha = "🥇";
-
-            else if(index === 1)
-                medalha = "🥈";
-
-            else if(index === 2)
-                medalha = "🥉";
-
-            const linha =
-                document.createElement("tr");
-
-            if(index === 0){
-                linha.classList.add("lider");
-            }
-
-            linha.innerHTML = `
-                <td class="posicao">
-                    ${medalha || index + 1}
-                </td>
-
-                <td>
-                    ${item.nome}
-                </td>
-
-                <td class="pontos">
-                    ${item.pontos}
-                </td>
-            `;
-
-            tbody.appendChild(linha);
-        });
-
-        document.getElementById(
-            "ultimaAtualizacao"
-        ).textContent =
-            new Date().toLocaleString(
-                "pt-BR"
-            );
-
-        loading.style.display = "none";
-        tabela.style.display = "table";
-
-    }
-    catch(ex){
-
-        loading.style.display = "none";
-
-        erro.style.display = "block";
-
-        erro.innerHTML =
-            "❌ Não foi possível carregar a classificação.";
-
-        console.error(ex);
-    }
-}
-
-carregarRanking();
-
-// Atualiza a cada 30 segundos
-setInterval(
-    carregarRanking,
-    30000
-);
-
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
