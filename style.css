@@ -103,3 +103,25 @@ tr:nth-child(even){
         font-size:14px;
     }
 }
+
+.acerto-exato{
+    background:#d4edda !important;
+}
+
+.acerto-vencedor{
+    background:#fff3cd !important;
+}
+
+.erro{
+    background:#f8d7da !important;
+}
+
+.artilheiro-card{
+    margin:20px 0;
+    padding:15px;
+    border-radius:10px;
+    background:#fff3cd;
+    border:1px solid #ffeeba;
+    font-size:18px;
+    text-align:center;
+}

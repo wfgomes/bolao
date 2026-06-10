@@ -19,49 +19,90 @@ async function carregarParticipante() {
 
         const dados = await response.json();
 
-        console.log(dados);
-
-        if (!dados || !dados.palpites) {
-
-            tabela.innerHTML =
-                "<tr><td>Nenhum palpite encontrado.</td></tr>";
-
-            return;
-        }
-
         document.getElementById("titulo").innerHTML =
             `⚽ Palpites de ${dados.nome}`;
 
         const linhas = dados.palpites;
 
+        let artilheiro = "";
+
         let html = `
-            <thead>
-                <tr>
-                    <th>Time 1</th>
-                    <th>Placar</th>
-                    <th>Time 2</th>
-                </tr>
-            </thead>
-            <tbody>
+        <thead>
+            <tr>
+                <th>Time 1</th>
+                <th>Placar</th>
+                <th>Time 2</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
         `;
 
-        for (let i = 1; i < linhas.length; i++) {
+        for(let i = 1; i < linhas.length; i++){
 
             const linha = linhas[i];
+
+            if(
+                linha[5] === "Artilheiro"
+            ){
+                artilheiro = linha[6];
+                continue;
+            }
 
             const time1 = linha[1];
             const placar1 = linha[2];
             const placar2 = linha[3];
             const time2 = linha[4];
+            const pontuacao = linha[7];
 
-            if (!time1 || !time2) continue;
+            if(!time1 || !time2){
+                continue;
+            }
+
+            let classe = "";
+            let status = "⏳ Não realizado";
+
+            const resultado1 = linha[5];
+            const resultado2 = linha[6];
+
+            const jogoFinalizado =
+                resultado1 !== "-" &&
+                resultado2 !== "-" &&
+                resultado1 !== "" &&
+                resultado2 !== "";
+
+            if(jogoFinalizado){
+
+                if(pontuacao == 3){
+
+                    classe = "acerto-exato";
+                    status = "🟢 Placar exato";
+
+                }
+                else if(pontuacao == 1){
+
+                    classe = "acerto-vencedor";
+                    status = "🟡 Acertou vencedor";
+
+                }
+                else{
+
+                    classe = "erro";
+                    status = "🔴 Errou";
+                }
+            }
 
             html += `
-                <tr>
-                    <td>${time1}</td>
-                    <td><strong>${placar1} x ${placar2}</strong></td>
-                    <td>${time2}</td>
-                </tr>
+            <tr class="${classe}">
+                <td>${time1}</td>
+                <td>
+                    <strong>
+                        ${placar1} x ${placar2}
+                    </strong>
+                </td>
+                <td>${time2}</td>
+                <td>${status}</td>
+            </tr>
             `;
         }
 
@@ -69,16 +110,30 @@ async function carregarParticipante() {
 
         tabela.innerHTML = html;
 
+        if(artilheiro){
+
+            document.getElementById("titulo")
+                .insertAdjacentHTML(
+                    "afterend",
+                    `
+                    <div class="artilheiro-card">
+                        🥇 Artilheiro escolhido:
+                        <strong>${artilheiro}</strong>
+                    </div>
+                    `
+                );
+        }
+
     } catch (erro) {
 
         console.error(erro);
 
         tabela.innerHTML =
-            "<tr><td>Erro ao carregar palpites.</td></tr>";
+            "<tr><td>Erro ao carregar dados</td></tr>";
     }
 
-    document.getElementById("loading").style.display =
-        "none";
+    document.getElementById("loading")
+        .style.display = "none";
 }
 
 carregarParticipante();
