@@ -87,7 +87,11 @@ async function carregarParticipante() {
                     } else {
                         const vP = placar1 > placar2 ? 1 : placar2 > placar1 ? -1 : 0;
                         const vG = r1 > r2 ? 1 : r2 > r1 ? -1 : 0;
-                        resultado = vP === vG ? "vencedor" : "erro";
+                        if(vP === vG){
+                            resultado = vP === 0 ? "empate" : "vencedor";
+                        } else {
+                            resultado = "erro";
+                        }
                     }
                 }
 
@@ -98,6 +102,9 @@ async function carregarParticipante() {
                 if(resultado === "exato"){
                     classe = "acerto-exato";
                     status = `🟢 Placar exato${sufixo}`;
+                } else if(resultado === "empate"){
+                    classe = "acerto-vencedor";
+                    status = `🟡 Empate${sufixo}`;
                 } else if(resultado === "vencedor"){
                     classe = "acerto-vencedor";
                     status = `🟡 Vencedor${sufixo}`;
