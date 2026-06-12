@@ -25,6 +25,7 @@ async function carregarParticipante() {
         const linhas = dados.palpites;
 
         let artilheiro = "";
+        let artilheiroGols = "";
 
         let html = `
         <thead>
@@ -46,6 +47,7 @@ async function carregarParticipante() {
                 linha[5] === "Artilheiro"
             ){
                 artilheiro = linha[6];
+                artilheiroGols = linha[7];
                 continue;
             }
 
@@ -119,6 +121,7 @@ async function carregarParticipante() {
                     <div class="artilheiro-card">
                         🥇 Artilheiro escolhido:
                         <strong>${artilheiro}</strong>
+                        ${artilheiroGols !== "" ? `<span class="artilheiro-gols">(${artilheiroGols} gols)</span>` : ""}
                     </div>
                     `
                 );
