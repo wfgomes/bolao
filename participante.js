@@ -52,10 +52,13 @@ async function carregarParticipante() {
             }
 
             const time1 = linha[1];
-            const placar1 = linha[2];
-            const placar2 = linha[3];
+            const placar1 = Number(linha[2]);
+            const placar2 = Number(linha[3]);
             const time2 = linha[4];
+            const resultado1 = linha[5];
+            const resultado2 = linha[6];
             const pontuacao = linha[7];
+            const statusPartida = linha[8];
 
             if(!time1 || !time2){
                 continue;
@@ -64,33 +67,43 @@ async function carregarParticipante() {
             let classe = "";
             let status = "⏳ Não realizado";
 
-            const resultado1 = linha[5];
-            const resultado2 = linha[6];
+            if(statusPartida !== "AG"){
 
-            const jogoFinalizado =
-                resultado1 !== "-" &&
-                resultado2 !== "-" &&
-                resultado1 !== "" &&
-                resultado2 !== "";
+                let resultado;
 
-            if(jogoFinalizado){
+                if(statusPartida === "FZ"){
 
-                if(pontuacao == 3){
+                    if(pontuacao == 3)     resultado = "exato";
+                    else if(pontuacao == 1) resultado = "vencedor";
+                    else                   resultado = "erro";
 
+                } else {
+
+                    const r1 = Number(resultado1);
+                    const r2 = Number(resultado2);
+
+                    if(placar1 === r1 && placar2 === r2){
+                        resultado = "exato";
+                    } else {
+                        const vP = placar1 > placar2 ? 1 : placar2 > placar1 ? -1 : 0;
+                        const vG = r1 > r2 ? 1 : r2 > r1 ? -1 : 0;
+                        resultado = vP === vG ? "vencedor" : "erro";
+                    }
+                }
+
+                const sufixo =
+                    statusPartida === "EA" || statusPartida === "IN" ? " ⏳ Em andamento" :
+                    "";
+
+                if(resultado === "exato"){
                     classe = "acerto-exato";
-                    status = "🟢 Placar exato";
-
-                }
-                else if(pontuacao == 1){
-
+                    status = `🟢 Placar exato${sufixo}`;
+                } else if(resultado === "vencedor"){
                     classe = "acerto-vencedor";
-                    status = "🟡 Acertou vencedor";
-
-                }
-                else{
-
+                    status = `🟡 Acertou vencedor${sufixo}`;
+                } else {
                     classe = "erro";
-                    status = "🔴 Errou";
+                    status = `🔴 Errou${sufixo}`;
                 }
             }
 
