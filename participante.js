@@ -100,7 +100,7 @@ async function carregarParticipante() {
                     status = `🟢 Placar exato${sufixo}`;
                 } else if(resultado === "vencedor"){
                     classe = "acerto-vencedor";
-                    status = `🟡 Acertou vencedor${sufixo}`;
+                    status = `🟡 Vencedor${sufixo}`;
                 } else {
                     classe = "erro";
                     status = `🔴 Errou${sufixo}`;
