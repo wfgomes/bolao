@@ -23,6 +23,21 @@ h1{
     margin-bottom:20px;
 }
 
+#pesquisa{
+    width:100%;
+    padding:10px 14px;
+    margin-bottom:16px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:15px;
+    outline:none;
+}
+
+#pesquisa:focus{
+    border-color:#0d6efd;
+    box-shadow:0 0 0 3px rgba(13,110,253,.15);
+}
+
 table{
     width:100%;
     border-collapse:collapse;

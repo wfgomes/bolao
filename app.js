@@ -56,3 +56,14 @@ async function carregarRanking() {
 carregarRanking();
 
 setInterval(carregarRanking, 30000);
+
+document.getElementById("pesquisa").addEventListener("input", function(){
+
+    const termo = this.value.toLowerCase();
+
+    document.querySelectorAll("#rankingTable tbody tr").forEach(tr => {
+
+        const nome = tr.querySelector("td:nth-child(2)")?.textContent.toLowerCase() ?? "";
+        tr.style.display = nome.includes(termo) ? "" : "none";
+    });
+});
