@@ -9,7 +9,7 @@
 <body>
 
 <div id="loading" class="loading">
-    Carregando palpites...
+    Carregando partidas...
 </div>
 
 <div class="container">
@@ -18,13 +18,24 @@
         ← Voltar para classificação
     </a>
 
-    <h1 id="titulo"></h1>
+    <h1>⚽ Acertos por Partida</h1>
 
-    <table id="palpites"></table>
+    <table id="partidasTable">
+        <thead>
+            <tr>
+                <th>Time 1</th>
+                <th>Placar</th>
+                <th>Time 2</th>
+                <th>Acertos</th>
+                <th>Quem acertou</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
 </div>
 
-<script src="participante.js"></script>
+<script src="partidas.js"></script>
 
 </body>
 </html>
