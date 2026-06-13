@@ -139,6 +139,113 @@ tr:nth-child(even){
     background:#f8d7da !important;
 }
 
+/* ── Partida cards ───────────────────────────── */
+#partidas-lista{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.partida-card{
+    background:white;
+    border:1px solid #dee2e6;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+
+.partida-jogo{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:12px 16px;
+    background:#f8f9fa;
+    border-bottom:1px solid #dee2e6;
+    flex-wrap:wrap;
+}
+
+.partida-time{
+    font-weight:bold;
+    font-size:14px;
+    color:#333;
+    flex:1;
+    text-align:center;
+    min-width:80px;
+}
+
+.partida-time:first-child{
+    text-align:right;
+}
+
+.partida-time:last-of-type{
+    text-align:left;
+}
+
+.card-placar{
+    font-size:20px;
+    font-weight:bold;
+    color:#0d6efd;
+    white-space:nowrap;
+    min-width:70px;
+    text-align:center;
+}
+
+.card-placar-ag{
+    font-size:18px;
+    color:#aaa;
+    min-width:70px;
+    text-align:center;
+}
+
+.card-badge-live{
+    font-size:11px;
+    font-weight:bold;
+    color:white;
+    background:#dc3545;
+    padding:3px 8px;
+    border-radius:10px;
+    animation:pulse 1.2s infinite;
+    white-space:nowrap;
+}
+
+@keyframes pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.5; }
+}
+
+.partida-acertos{
+    padding:10px 16px;
+    display:flex;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:6px;
+    min-height:38px;
+}
+
+.card-total{
+    font-weight:bold;
+    color:#198754;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+.card-nomes{
+    font-size:13px;
+    color:#555;
+    line-height:1.6;
+}
+
+.card-nomes .participante{
+    font-weight:normal;
+}
+
+.card-ninguem{
+    font-size:13px;
+    color:#aaa;
+    font-style:italic;
+}
+
 /* ── Nav links ───────────────────────────────── */
 .nav-links{
     display:flex;

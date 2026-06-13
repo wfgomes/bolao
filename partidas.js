@@ -67,40 +67,50 @@ async function carregarPartidas() {
             }
         }
 
-        const tbody = document.querySelector("#partidasTable tbody");
-        tbody.innerHTML = "";
+        const lista = document.getElementById("partidas-lista");
+        lista.innerHTML = "";
 
         for(const partida of partidas){
 
             const { time1, time2, resultado1, resultado2, status, acertadores } = partida;
 
-            let placarTexto;
-            if(status === "AG"){
-                placarTexto = `<span class="placar-ag">– x –</span>`;
+            const aoVivo = status === "EA" || status === "IN";
+
+            const placar = status === "AG"
+                ? `<span class="card-placar-ag">– x –</span>`
+                : `<span class="card-placar">${resultado1} x ${resultado2}</span>`;
+
+            const statusBadge = aoVivo
+                ? `<span class="card-badge-live">● Ao vivo</span>`
+                : "";
+
+            const total = acertadores.length;
+
+            let acertosHtml;
+            if(total === 0){
+                acertosHtml = `<span class="card-ninguem">Ninguém acertou o placar exato</span>`;
             } else {
-                placarTexto = `<strong>${resultado1} x ${resultado2}</strong>`;
+                const nomes = acertadores.map(n =>
+                    `<a class="participante" href="participante.html?nome=${encodeURIComponent(n)}">${n}</a>`
+                ).join(" · ");
+                acertosHtml = `
+                    <span class="card-total">${total} acerto${total > 1 ? "s" : ""}</span>
+                    <span class="card-nomes">${nomes}</span>
+                `;
             }
 
-            const totalAcertos = acertadores.length;
-
-            const badgeAcertos = totalAcertos > 0
-                ? `<span class="badge-acertos">${totalAcertos}</span>`
-                : `<span class="badge-zero">0</span>`;
-
-            const nomesTexto = acertadores.length > 0
-                ? acertadores.map(n =>
-                    `<a class="participante" href="participante.html?nome=${encodeURIComponent(n)}">${n}</a>`
-                  ).join(", ")
-                : "–";
-
-            tbody.innerHTML += `
-            <tr>
-                <td class="td-time">${time1}</td>
-                <td>${placarTexto}</td>
-                <td class="td-time">${time2}</td>
-                <td>${badgeAcertos}</td>
-                <td class="td-acertadores">${nomesTexto}</td>
-            </tr>
+            lista.innerHTML += `
+            <div class="partida-card">
+                <div class="partida-jogo">
+                    <span class="partida-time">${time1}</span>
+                    ${placar}
+                    <span class="partida-time">${time2}</span>
+                    ${statusBadge}
+                </div>
+                <div class="partida-acertos">
+                    ${acertosHtml}
+                </div>
+            </div>
             `;
         }
 
@@ -108,9 +118,8 @@ async function carregarPartidas() {
 
         console.error(erro);
 
-        document.querySelector("#partidasTable tbody")
-            .innerHTML =
-            "<tr><td colspan='5'>Erro ao carregar dados</td></tr>";
+        document.getElementById("partidas-lista")
+            .innerHTML = `<p style="color:red">Erro ao carregar dados.</p>`;
     }
 
     document.getElementById("loading").style.display = "none";
