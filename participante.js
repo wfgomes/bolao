@@ -60,9 +60,13 @@ async function carregarParticipante() {
 
                 if(statusPartida === "FZ"){
 
-                    if(pontuacao == 3)     resultado = "exato";
-                    else if(pontuacao == 1) resultado = "vencedor";
-                    else                   resultado = "erro";
+                    if(pontuacao == 3){
+                        resultado = "exato";
+                    } else if(pontuacao == 1){
+                        resultado = Number(resultado1) === Number(resultado2) ? "empate" : "vencedor";
+                    } else {
+                        resultado = "erro";
+                    }
 
                 } else {
 
@@ -97,7 +101,7 @@ async function carregarParticipante() {
                     status = `🟡 Vencedor${sufixo}`;
                 } else {
                     classe = "erro";
-                    status = `🔴 Errou${sufixo}`;
+                    status = `🔴 Erro${sufixo}`;
                 }
             }
 
