@@ -85,6 +85,15 @@ function setLoadingText(texto) {
 
 async function buscarPartidas() {
 
+    // Tenta o arquivo pré-processado primeiro (instantâneo)
+    try {
+        const res = await fetch("partidas-cache.json?_=" + Date.now());
+        if(res.ok){
+            const data = await res.json();
+            if(Array.isArray(data) && data.length > 0) return data;
+        }
+    } catch { /* arquivo não existe, segue para busca ao vivo */ }
+
     setLoadingText("Buscando participantes...");
 
     const ranking = await fetch(URL).then(r => r.json());
@@ -133,9 +142,7 @@ async function buscarPartidas() {
             const partida    = partidas[idx];
 
             if(statusP === "FZ" && pontuacao == 3){
-
                 partida.acertadores.push(participante.nome);
-
             } else if(
                 (statusP === "EA" || statusP === "IN") &&
                 resultado1 !== "-" && resultado2 !== "-" &&
@@ -192,8 +199,9 @@ async function carregarPartidas() {
     } catch(erro) {
 
         console.error(erro);
+
         document.getElementById("partidas-lista")
-            .innerHTML = `<p style="color:red;padding:16px">Erro ao carregar dados. Tente novamente.</p>`;
+            .innerHTML = `<p style="padding:16px;color:red">Erro ao carregar dados. Tente novamente.</p>`;
     }
 
     document.getElementById("loading").style.display = "none";
