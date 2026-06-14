@@ -1,5 +1,5 @@
 const URL =
-"https://script.google.com/macros/s/AKfycbyojpRImDbG35m9vpmoaIMbZzboPw6tgCyI_qayE12BCPJqdp_CyzF_hKEXE3MiPbryig/exec";
+"https://script.google.com/macros/s/AKfycbxyaSNgT0GA-X86v661OUcoWzHvaBDGQaIYBLMHcjO1NlneikjWZztS-AumYflFC6xDJQ/exec";
  
 function renderPartidas(partidas) {
 
