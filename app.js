@@ -1,5 +1,5 @@
 const URL =
-"https://script.google.com/macros/s/AKfycbywSw01CSQHHRH5ZF1H8fALI6vbSfQFJwZHk-bWLIjrrXDyCxuX6sgNcyOJoiaD9idXug/exec";
+"https://script.google.com/macros/s/AKfycbyojpRImDbG35m9vpmoaIMbZzboPw6tgCyI_qayE12BCPJqdp_CyzF_hKEXE3MiPbryig/exec";
 
 async function carregarRanking() {
 
