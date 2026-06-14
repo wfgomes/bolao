@@ -3,9 +3,6 @@ const URL =
 
 async function carregarParticipante() {
 
-    const tabela =
-        document.getElementById("palpites");
-
     const nome =
         new URLSearchParams(window.location.search)
         .get("nome");
@@ -27,17 +24,7 @@ async function carregarParticipante() {
         let artilheiro = "";
         let artilheiroGols = "";
 
-        let html = `
-        <thead>
-            <tr>
-                <th>Time 1</th>
-                <th>Placar</th>
-                <th>Time 2</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-        `;
+        let html = "";
 
         for(let i = 1; i < linhas.length; i++){
 
@@ -114,23 +101,25 @@ async function carregarParticipante() {
                 }
             }
 
+            const aoVivo = statusPartida === "EA" || statusPartida === "IN";
+            const liveBadge = aoVivo ? `<span class="card-badge-live">● Ao vivo</span>` : "";
+
             html += `
-            <tr class="${classe}">
-                <td>${time1}</td>
-                <td>
-                    <strong>
-                        ${placar1} x ${placar2}
-                    </strong>
-                </td>
-                <td>${time2}</td>
-                <td>${status}</td>
-            </tr>
+            <div class="partida-card">
+                <div class="partida-jogo">
+                    <span class="partida-time">${time1}</span>
+                    <span class="card-placar">${placar1} x ${placar2}</span>
+                    <span class="partida-time">${time2}</span>
+                    ${liveBadge}
+                </div>
+                <div class="palpite-status palpite-${classe || "ag"}">
+                    ${status}
+                </div>
+            </div>
             `;
         }
 
-        html += "</tbody>";
-
-        tabela.innerHTML = html;
+        document.getElementById("palpites-lista").innerHTML = html;
 
         if(artilheiro){
 
@@ -151,8 +140,8 @@ async function carregarParticipante() {
 
         console.error(erro);
 
-        tabela.innerHTML =
-            "<tr><td>Erro ao carregar dados</td></tr>";
+        document.getElementById("palpites-lista").innerHTML =
+            `<p style="color:red;padding:16px">Erro ao carregar dados.</p>`;
     }
 
     document.getElementById("loading")

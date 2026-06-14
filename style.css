@@ -11,7 +11,7 @@ body{
 }
 
 .container{
-    max-width:1200px;
+    max-width:600px;
     margin:auto;
     background:white;
     border-radius:12px;
@@ -31,6 +31,7 @@ h1{
     text-align:center;
 }
 
+/* ── Search ──────────────────────────────────────── */
 #pesquisa{
     width:100%;
     padding:10px 14px;
@@ -46,27 +47,7 @@ h1{
     box-shadow:0 0 0 3px rgba(13,110,253,.15);
 }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th{
-    background:#0d6efd;
-    color:white;
-}
-
-th,
-td{
-    padding:12px;
-    border:1px solid #ddd;
-    text-align:center;
-}
-
-tr:nth-child(even){
-    background:#f8f8f8;
-}
-
+/* ── Shared link styles ──────────────────────────── */
 .participante{
     text-decoration:none;
     color:#0d6efd;
@@ -85,6 +66,7 @@ tr:nth-child(even){
     font-weight:bold;
 }
 
+/* ── Loading ─────────────────────────────────────── */
 .loading{
     position:fixed;
     inset:0;
@@ -92,71 +74,92 @@ tr:nth-child(even){
     display:flex;
     justify-content:center;
     align-items:center;
-    font-size:24px;
+    font-size:20px;
+    color:#555;
     z-index:9999;
 }
 
-#palpites td:nth-child(2){
-    font-size:18px;
+/* ── Nav links ───────────────────────────────────── */
+.nav-links{
+    display:flex;
+    gap:8px;
+    margin-bottom:20px;
+    border-bottom:2px solid #dee2e6;
+    padding-bottom:0;
+}
+
+.nav-link{
+    text-decoration:none;
+    color:#0d6efd;
     font-weight:bold;
+    font-size:14px;
+    padding:8px 14px;
+    border-radius:6px 6px 0 0;
+    border:1px solid transparent;
+    border-bottom:none;
+    position:relative;
+    bottom:-2px;
+}
+
+.nav-link:hover{
+    background:#f0f4ff;
+}
+
+.nav-link-ativo{
+    background:white;
+    border-color:#dee2e6;
+    color:#333;
+}
+
+/* ── Ranking cards ───────────────────────────────── */
+#ranking-lista{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.ranking-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:white;
+    border:1px solid #dee2e6;
+    border-radius:10px;
+    padding:12px 16px;
+    box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+
+.pos-ouro  { border-left:4px solid #FFD700; }
+.pos-prata { border-left:4px solid #A8A8A8; }
+.pos-bronze{ border-left:4px solid #CD7F32; }
+
+.ranking-pos{
+    font-size:22px;
+    min-width:36px;
+    text-align:center;
+}
+
+.ranking-nome{
+    flex:1;
+    font-size:15px;
+}
+
+.ranking-pontos{
+    font-size:16px;
+    font-weight:bold;
+    color:#198754;
     white-space:nowrap;
 }
 
-#palpites td:first-child{
-    text-align:right;
-}
-
-#palpites td:last-child{
-    text-align:left;
-}
-
-@media(max-width:768px){
-
-    body{
-        padding:10px;
-    }
-
-    th,
-    td{
-        padding:8px;
-        font-size:12px;
-    }
-
-    #palpites td:nth-child(2){
-        font-size:14px;
-    }
-}
-
-.acerto-exato{
-    background:#d4edda !important;
-}
-
-.acerto-vencedor{
-    background:#fff3cd !important;
-}
-
-.erro{
-    background:#f8d7da !important;
-}
-
-/* ── Partida cards ───────────────────────────── */
-.cache-info{
-    font-size:12px;
+.ranking-pontos small{
+    font-size:11px;
     color:#888;
-    margin-bottom:12px;
-    min-height:18px;
+    font-weight:normal;
 }
 
-.cache-info a{
-    color:#0d6efd;
-    text-decoration:none;
-}
-
-.cache-info a:hover{
-    text-decoration:underline;
-}
-
-#partidas-lista{
+/* ── Partida / Palpite cards ─────────────────────── */
+#partidas-lista,
+#palpites-lista{
     display:flex;
     flex-direction:column;
     gap:10px;
@@ -190,13 +193,8 @@ tr:nth-child(even){
     min-width:80px;
 }
 
-.partida-time:first-child{
-    text-align:right;
-}
-
-.partida-time:last-of-type{
-    text-align:left;
-}
+.partida-time:first-child{ text-align:right; }
+.partida-time:last-of-type{ text-align:left; }
 
 .card-placar{
     font-size:20px;
@@ -230,6 +228,7 @@ tr:nth-child(even){
     50%{ opacity:.5; }
 }
 
+/* ── Partidas — acertadores ──────────────────────── */
 .partida-acertos{
     padding:10px 16px;
     display:flex;
@@ -252,9 +251,7 @@ tr:nth-child(even){
     line-height:1.6;
 }
 
-.card-nomes .participante{
-    font-weight:normal;
-}
+.card-nomes .participante{ font-weight:normal; }
 
 .card-ninguem{
     font-size:13px;
@@ -262,88 +259,52 @@ tr:nth-child(even){
     font-style:italic;
 }
 
-/* ── Nav links ───────────────────────────────── */
-.nav-links{
-    display:flex;
-    gap:8px;
-    margin-bottom:20px;
-    border-bottom:2px solid #dee2e6;
-    padding-bottom:0;
-}
-
-.nav-link{
-    text-decoration:none;
-    color:#0d6efd;
+/* ── Palpites — status ───────────────────────────── */
+.palpite-status{
+    padding:9px 16px;
+    font-size:13px;
     font-weight:bold;
-    font-size:14px;
-    padding:8px 14px;
-    border-radius:6px 6px 0 0;
-    border:1px solid transparent;
-    border-bottom:none;
-    position:relative;
-    bottom:-2px;
 }
 
-.nav-link:hover{
-    background:#f0f4ff;
-}
+.palpite-acerto-exato   { background:#d4edda; color:#155724; }
+.palpite-acerto-vencedor{ background:#fff3cd; color:#856404; }
+.palpite-erro           { background:#f8d7da; color:#721c24; }
+.palpite-ag             { background:#f8f9fa; color:#888; font-weight:normal; font-style:italic; }
 
-.nav-link-ativo{
-    background:white;
-    border-color:#dee2e6;
-    color:#333;
-}
-
-/* ── Partidas table ──────────────────────────── */
-.td-time{
-    text-align:right;
-}
-
-.td-time:last-of-type{
-    text-align:left;
-}
-
-.td-acertadores{
-    text-align:left;
-    font-size:13px;
-    color:#555;
-}
-
-.placar-ag{
-    color:#aaa;
-    font-size:13px;
-}
-
-.badge-acertos{
-    display:inline-block;
-    background:#198754;
-    color:white;
-    font-weight:bold;
-    font-size:13px;
-    padding:3px 10px;
-    border-radius:12px;
-    min-width:28px;
-    text-align:center;
-}
-
-.badge-zero{
-    display:inline-block;
-    background:#dee2e6;
-    color:#888;
-    font-weight:bold;
-    font-size:13px;
-    padding:3px 10px;
-    border-radius:12px;
-    min-width:28px;
-    text-align:center;
-}
-
+/* ── Artilheiro card ─────────────────────────────── */
 .artilheiro-card{
-    margin:20px 0;
-    padding:15px;
+    margin:16px 0;
+    padding:12px 16px;
     border-radius:10px;
     background:#fff3cd;
     border:1px solid #ffeeba;
-    font-size:18px;
+    font-size:15px;
     text-align:center;
+}
+
+/* ── Cache info ──────────────────────────────────── */
+.cache-info{
+    font-size:12px;
+    color:#888;
+    margin-bottom:12px;
+    min-height:18px;
+}
+
+.cache-info a{
+    color:#0d6efd;
+    text-decoration:none;
+}
+
+.cache-info a:hover{ text-decoration:underline; }
+
+/* ── Responsive ──────────────────────────────────── */
+@media(max-width:600px){
+
+    body{ padding:10px; }
+
+    .container{ padding:14px; }
+
+    .card-placar{ font-size:17px; }
+
+    .partida-time{ font-size:12px; min-width:60px; }
 }

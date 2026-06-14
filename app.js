@@ -12,32 +12,27 @@ async function carregarRanking() {
             (a, b) => Number(b.pontos || 0) - Number(a.pontos || 0)
         );
 
-        const tbody =
-            document.querySelector("#rankingTable tbody");
-
-        tbody.innerHTML = "";
+        const lista = document.getElementById("ranking-lista");
+        lista.innerHTML = "";
 
         ranking.forEach((item, index) => {
 
             let posicao = index + 1;
+            let posClasse = "";
 
-            if (index === 0) posicao = "🥇";
-            else if (index === 1) posicao = "🥈";
-            else if (index === 2) posicao = "🥉";
+            if (index === 0) { posicao = "🥇"; posClasse = "pos-ouro"; }
+            else if (index === 1) { posicao = "🥈"; posClasse = "pos-prata"; }
+            else if (index === 2) { posicao = "🥉"; posClasse = "pos-bronze"; }
 
-            tbody.innerHTML += `
-                <tr>
-                    <td>${posicao}</td>
-
-                    <td>
-                        <a class="participante"
-                           href="participante.html?nome=${encodeURIComponent(item.nome)}">
-                            ${item.nome}
-                        </a>
-                    </td>
-
-                    <td>${item.pontos}</td>
-                </tr>
+            lista.innerHTML += `
+                <div class="ranking-card ${posClasse}">
+                    <span class="ranking-pos">${posicao}</span>
+                    <a class="participante ranking-nome"
+                       href="participante.html?nome=${encodeURIComponent(item.nome)}">
+                        ${item.nome}
+                    </a>
+                    <span class="ranking-pontos">${item.pontos} <small>pts</small></span>
+                </div>
             `;
         });
 
@@ -61,9 +56,9 @@ document.getElementById("pesquisa").addEventListener("input", function(){
 
     const termo = this.value.toLowerCase();
 
-    document.querySelectorAll("#rankingTable tbody tr").forEach(tr => {
+    document.querySelectorAll("#ranking-lista .ranking-card").forEach(card => {
 
-        const nome = tr.querySelector("td:nth-child(2)")?.textContent.toLowerCase() ?? "";
-        tr.style.display = nome.includes(termo) ? "" : "none";
+        const nome = card.querySelector(".ranking-nome")?.textContent.toLowerCase() ?? "";
+        card.style.display = nome.includes(termo) ? "" : "none";
     });
 });
