@@ -9,7 +9,7 @@ function renderPartidas(partidas) {
 
     for (const [idx, partida] of partidas.entries()) {
         const { time1, time2, resultado1, resultado2, status, cravadas, acertos, erros } = partida;
-        if (status === "AG") continue;
+        if (status !== "FZ") continue;
 
         const aoVivo = status === "EA" || status === "IN";
         const placar = `<span class="card-placar">${resultado1} x ${resultado2}</span>`;
