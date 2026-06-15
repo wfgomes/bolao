@@ -294,3 +294,17 @@ h1{
 
     .partida-time{ font-size:12px; min-width:60px; }
 }
+
+.partida-resumo {
+    display: flex;
+    gap: 16px;
+    padding: 8px 0;
+    font-size: 13px;
+}
+.resumo-item { display: flex; align-items: center; gap: 4px; }
+.partida-detalhes { padding: 8px 0; border-top: 0.5px solid var(--border); }
+.detalhe-grupo { margin-bottom: 8px; }
+.detalhe-label { font-size: 12px; font-weight: 600; margin-right: 6px; }
+.cravada { color: #f59e0b; }
+.acerto  { color: #22c55e; }
+.erro    { color: #ef4444; }
