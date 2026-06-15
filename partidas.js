@@ -38,66 +38,56 @@ function renderPartidas(partidas) {
     }
 }
 
-function toggleDetalhes(idx) {
-    const detalhes = document.getElementById(`detalhes-${idx}`);
-    const aberto = detalhes.style.display !== "none";
+async function toggleDetalhes(idx) {
+  const detalhes = document.getElementById(`detalhes-${idx}`);
+  const aberto = detalhes.style.display !== "none";
 
-    if (aberto) {
-        detalhes.style.display = "none";
-        return;
-    }
+  if (aberto) {
+    detalhes.style.display = "none";
+    return;
+  }
 
-    detalhes.style.display = "block";
+  detalhes.style.display = "block";
+  if (detalhes.dataset.carregado === "true") return;
 
-    // Só calcula se ainda não foi carregado
-    if (detalhes.dataset.carregado === "true") return;
+  detalhes.innerHTML = `<div class="loading-detalhes">Carregando...</div>`;
 
-    const partida = dadosGlobais[idx];
-    const cravadores = [];
-    const acertadores = [];
-    const erradores = [];
+  try {
+    const dados = await fetch(`${URL}?partida=${idx}`).then(r => r.json());
 
-    for (const participante of dadosGlobais._participantes) {
-        const linha = participante.palpites.slice(1).filter(l =>
-            l[5] !== "Artilheiro" && l[1] && l[4]
-        )[idx];
-        if (!linha) continue;
+    const cravadores = [], acertadores = [], erradores = [];
 
-        const pontuacao = linha[7];
-        const statusP = linha[8];
-
-        if (statusP !== "FZ" && statusP !== "EA" && statusP !== "IN") continue;
-
-        if (pontuacao == 3) {
-            cravadores.push(participante.nome);
-        } else if (pontuacao == 1) {
-            acertadores.push(participante.nome);
-        } else {
-            erradores.push(participante.nome);
-        }
+    for (const p of dados) {
+      if (p.status !== "FZ" && p.status !== "EA" && p.status !== "IN") continue;
+      if (p.pontuacao == 3) cravadores.push(p.nome);
+      else if (p.pontuacao == 1) acertadores.push(p.nome);
+      else erradores.push(p.nome);
     }
 
     const linkNome = n =>
-        `<a class="participante" href="participante.html?nome=${encodeURIComponent(n)}">${n}</a>`;
+      `<a class="participante" href="participante.html?nome=${encodeURIComponent(n)}">${n}</a>`;
 
     detalhes.innerHTML = `
-        ${cravadores.length > 0 ? `
-        <div class="detalhe-grupo">
-            <span class="detalhe-label cravada">🎯 Cravou (${cravadores.length})</span>
-            <span class="card-nomes">${cravadores.map(linkNome).join(" · ")}</span>
-        </div>` : ""}
-        ${acertadores.length > 0 ? `
-        <div class="detalhe-grupo">
-            <span class="detalhe-label acerto">✅ Resultado (${acertadores.length})</span>
-            <span class="card-nomes">${acertadores.map(linkNome).join(" · ")}</span>
-        </div>` : ""}
-        ${erradores.length > 0 ? `
-        <div class="detalhe-grupo">
-            <span class="detalhe-label erro">❌ Errou (${erradores.length})</span>
-            <span class="card-nomes">${erradores.map(linkNome).join(" · ")}</span>
-        </div>` : ""}
+      ${cravadores.length > 0 ? `
+      <div class="detalhe-grupo">
+        <span class="detalhe-label cravada">🎯 Cravou (${cravadores.length})</span>
+        <span class="card-nomes">${cravadores.map(linkNome).join(" · ")}</span>
+      </div>` : ""}
+      ${acertadores.length > 0 ? `
+      <div class="detalhe-grupo">
+        <span class="detalhe-label acerto">✅ Resultado (${acertadores.length})</span>
+        <span class="card-nomes">${acertadores.map(linkNome).join(" · ")}</span>
+      </div>` : ""}
+      ${erradores.length > 0 ? `
+      <div class="detalhe-grupo">
+        <span class="detalhe-label erro">❌ Errou (${erradores.length})</span>
+        <span class="card-nomes">${erradores.map(linkNome).join(" · ")}</span>
+      </div>` : ""}
     `;
     detalhes.dataset.carregado = "true";
+  } catch (erro) {
+    detalhes.innerHTML = `<p style="color:red">Erro ao carregar detalhes.</p>`;
+  }
 }
 
 async function carregarPartidas() {
