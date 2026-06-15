@@ -26,9 +26,9 @@ function renderPartidas(partidas) {
                 ${statusBadge}
             </div>
             <div class="partida-resumo">
-                <span class="resumo-item cravada">🎯 Cravou: <strong>${cravadas}</strong></span>
+                <span class="resumo-item cravada">🎯 Cravada: <strong>${cravadas}</strong></span>
                 <span class="resumo-item acerto">✅ Resultado: <strong>${acertos}</strong></span>
-                <span class="resumo-item erro">❌ Errou: <strong>${erros}</strong></span>
+                <span class="resumo-item erro">❌ Erro: <strong>${erros}</strong></span>
             </div>
             <div class="partida-detalhes" id="detalhes-${idx}" style="display:none">
                 <div class="loading-detalhes">Carregando...</div>
