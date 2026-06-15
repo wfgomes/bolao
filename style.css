@@ -305,6 +305,6 @@ h1{
 .partida-detalhes { padding: 8px 0; border-top: 0.5px solid var(--border); }
 .detalhe-grupo { margin-bottom: 8px; }
 .detalhe-label { font-size: 12px; font-weight: 600; margin-right: 6px; }
-.cravada { color: #f59e0b; }
-.acerto  { color: #22c55e; }
+.cravada { color: #22c55e; }
+.acerto  { color: #f59e0b; }
 .erro    { color: #ef4444; }
