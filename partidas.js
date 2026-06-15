@@ -92,28 +92,20 @@ async function toggleDetalhes(idx) {
 
 async function carregarPartidas() {
   try {
-    const dados = await fetch(`${URL}?todos=true`).then(r => r.json());
-    const todos = dados.participantes;
-    const resumo = dados.resumo;
+    const resumo = await fetch(`${URL}?resumo=true`).then(r => r.json());
 
-    const partidas = [];
-    for (const [idx, linha] of todos[0].palpites.slice(1).entries()) {
-      if (linha[5] === "Artilheiro" || !linha[1] || !linha[4]) continue;
-      partidas.push({
-        time1:      linha[1],
-        time2:      linha[4],
-        resultado1: linha[5],
-        resultado2: linha[6],
-        status:     linha[8],
-        cravadas:   resumo[idx]?.cravadas ?? 0,
-        acertos:    resumo[idx]?.acertos  ?? 0,
-        erros:      resumo[idx]?.erros    ?? 0,
-      });
-    }
+    const partidas = resumo.map(r => ({
+      time1:      r.time1,
+      time2:      r.time2,
+      resultado1: r.resultado1,
+      resultado2: r.resultado2,
+      status:     r.status,
+      cravadas:   r.cravadas,
+      acertos:    r.acertos,
+      erros:      r.erros,
+    }));
 
     dadosGlobais = partidas;
-    dadosGlobais._participantes = todos;
-
     renderPartidas(partidas);
   } catch (erro) {
     console.error(erro);
