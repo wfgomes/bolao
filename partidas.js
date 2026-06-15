@@ -101,36 +101,36 @@ function toggleDetalhes(idx) {
 }
 
 async function carregarPartidas() {
-    try {
-        const todos = await fetch(`${URL}?todos=true`).then(r => r.json());
+  try {
+    const dados = await fetch(`${URL}?todos=true`).then(r => r.json());
+    const todos = dados.participantes;
+    const resumo = dados.resumo;
 
-        // Monta lista de partidas com resumo das colunas I, J, K do Gabarito
-        const partidas = [];
-        for (const linha of todos[0].palpites.slice(1)) {
-            if (linha[5] === "Artilheiro" || !linha[1] || !linha[4]) continue;
-            partidas.push({
-                time1:      linha[1],
-                time2:      linha[4],
-                resultado1: linha[5],
-                resultado2: linha[6],
-                status:     linha[8],
-                cravadas:   linha[9]  ?? 0,  // coluna I
-                acertos:    linha[10] ?? 0,  // coluna J
-                erros:      linha[11] ?? 0,  // coluna K
-            });
-        }
-
-        // Salva dados globais para uso no clique
-        dadosGlobais = partidas;
-        dadosGlobais._participantes = todos;
-
-        renderPartidas(partidas);
-    } catch (erro) {
-        console.error(erro);
-        document.getElementById("partidas-lista")
-            .innerHTML = `<p style="padding:16px;color:red">Erro ao carregar dados. Tente novamente.</p>`;
+    const partidas = [];
+    for (const [idx, linha] of todos[0].palpites.slice(1).entries()) {
+      if (linha[5] === "Artilheiro" || !linha[1] || !linha[4]) continue;
+      partidas.push({
+        time1:      linha[1],
+        time2:      linha[4],
+        resultado1: linha[5],
+        resultado2: linha[6],
+        status:     linha[8],
+        cravadas:   resumo[idx]?.cravadas ?? 0,
+        acertos:    resumo[idx]?.acertos  ?? 0,
+        erros:      resumo[idx]?.erros    ?? 0,
+      });
     }
-    document.getElementById("loading").style.display = "none";
+
+    dadosGlobais = partidas;
+    dadosGlobais._participantes = todos;
+
+    renderPartidas(partidas);
+  } catch (erro) {
+    console.error(erro);
+    document.getElementById("partidas-lista")
+      .innerHTML = `<p style="padding:16px;color:red">Erro ao carregar dados. Tente novamente.</p>`;
+  }
+  document.getElementById("loading").style.display = "none";
 }
 
 carregarPartidas();
