@@ -7,7 +7,8 @@ function renderPartidas(partidas) {
     const lista = document.getElementById("partidas-lista");
     lista.innerHTML = "";
 
-    for (const [idx, partida] of partidas.entries()) {
+    for (let idx = partidas.length - 1; idx >= 0; idx--) {
+        const partida = partidas[idx];
         const { time1, time2, resultado1, resultado2, status, cravadas, acertos, erros } = partida;
         if (status === "AG") continue;
 
