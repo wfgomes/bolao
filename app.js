@@ -40,9 +40,9 @@ async function carregarRanking() {
 
         console.error(erro);
 
-        document.querySelector("#rankingTable tbody")
+        document.getElementById("ranking-lista")
             .innerHTML =
-            "<tr><td colspan='3'>Erro ao carregar dados</td></tr>";
+            "<p style='color:red;padding:16px'>Erro ao carregar dados.</p>";
     }
 
     document.getElementById("loading").style.display = "none";

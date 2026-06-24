@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolão dos Amigos - Probabilidades</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="loading" class="loading" style="display:none">
+    Calculando probabilidades...
+</div>
+
+<div class="container">
+
+    <h1 class="titulo-sistema">🏆 Bolão dos Amigos</h1>
+
+    <div class="nav-links">
+        <a class="nav-link" href="index.html">🏆 Classificação</a>
+        <a class="nav-link" href="partidas.html">⚽ Acertos por Partida</a>
+        <a class="nav-link nav-link-ativo" href="probabilidade.html">📊 Probabilidades</a>
+    </div>
+
+    <div class="prob-input-area">
+        <label for="participantes-input">Participantes (um por linha):</label>
+        <textarea
+            id="participantes-input"
+            placeholder="Bruno&#10;Cecilia&#10;Genivaldo"
+            rows="5"
+        ></textarea>
+        <button id="calcular-btn" onclick="calcular()">
+            📊 Calcular Probabilidades
+        </button>
+    </div>
+
+    <div id="resultado" style="display:none">
+        <div id="prob-lista"></div>
+        <div id="artilheiros-lista"></div>
+        <div id="jogos-diferentes"></div>
+        <p class="prob-nota">
+            Simulação com 100.000 cenários · P(vitória casa) 40% · P(empate) 25% · P(vitória fora) 35% · P(placar exato dado resultado correto) 10%
+        </p>
+    </div>
+
+</div>
+
+<script src="probabilidade.js"></script>
+</body>
+</html>
