@@ -87,7 +87,7 @@ function parseData(dados) {
 
         const status = linha[8];
 
-        if (status === "AG") {
+        if (status != "FZ") {
             jogosAG.push({
                 key: `${time1}|||${time2}`,
                 time1,
@@ -96,7 +96,7 @@ function parseData(dados) {
                 time2
             });
         } else {
-            // FZ, EA, IN — jogo já disputado
+            // FZ — jogo já disputado
             jogosJogadosPorTime[time1] = (jogosJogadosPorTime[time1] || 0) + 1;
             jogosJogadosPorTime[time2] = (jogosJogadosPorTime[time2] || 0) + 1;
         }
