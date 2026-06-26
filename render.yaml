@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: bolao-copa-2026
+    runtime: node
+    branch: prod
+    buildCommand: cd frontend && npm ci && npm run build && cd ../backend && npm ci
+    startCommand: node backend/src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false          # você preenche no dashboard
+      - key: JWT_SECRET
+        generateValue: true  # render gera automaticamente
