@@ -5,6 +5,14 @@ const { adminMiddleware } = require('../middleware/auth');
 
 router.use(adminMiddleware);
 
+async function recalcPoints(gameId, rh, ra) {
+  const { rows: preds } = await db.query('SELECT * FROM predictions WHERE game_id = $1', [gameId]);
+  for (const pred of preds) {
+    const pts = calcPoints(pred.home_score, pred.away_score, rh, ra);
+    await db.query('UPDATE predictions SET points = $1 WHERE id = $2', [pts, pred.id]);
+  }
+}
+
 function calcPoints(ph, pa, rh, ra) {
   ph = Number(ph); pa = Number(pa); rh = Number(rh); ra = Number(ra);
   if (ph === rh && pa === ra) return 3;
@@ -170,7 +178,7 @@ router.delete('/games/:id', async (req, res) => {
   } catch (e) { res.status(500).json({ error: 'Erro ao excluir jogo' }); }
 });
 
-// Set game result and recalculate points
+// Salva placar → status EA (Em Andamento), recalcula pontos
 router.put('/games/:id/result', async (req, res) => {
   const { id } = req.params;
   const { home_score, away_score } = req.body;
@@ -179,18 +187,41 @@ router.put('/games/:id/result', async (req, res) => {
   }
   try {
     await db.query(
-      'UPDATE games SET home_score = $1, away_score = $2, is_finished = TRUE WHERE id = $3',
-      [home_score, away_score, id]
+      'UPDATE games SET home_score = $1, away_score = $2, status = $3, is_finished = FALSE WHERE id = $4',
+      [home_score, away_score, 'EA', id]
     );
-    const { rows: preds } = await db.query('SELECT * FROM predictions WHERE game_id = $1', [id]);
-    for (const pred of preds) {
-      const pts = calcPoints(pred.home_score, pred.away_score, home_score, away_score);
-      await db.query('UPDATE predictions SET points = $1 WHERE id = $2', [pts, pred.id]);
-    }
+    await recalcPoints(id, home_score, away_score);
     res.json({ success: true });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Erro ao salvar resultado' });
+  }
+});
+
+// Finaliza jogo → status FZ
+router.put('/games/:id/finalizar', async (req, res) => {
+  try {
+    await db.query(
+      'UPDATE games SET status = $1, is_finished = TRUE WHERE id = $2',
+      ['FZ', req.params.id]
+    );
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Erro ao finalizar jogo' });
+  }
+});
+
+// Cancela resultado → limpa placar e pontos
+router.delete('/games/:id/result', async (req, res) => {
+  try {
+    await db.query(
+      'UPDATE games SET home_score = NULL, away_score = NULL, status = NULL, is_finished = FALSE WHERE id = $1',
+      [req.params.id]
+    );
+    await db.query('UPDATE predictions SET points = NULL WHERE game_id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Erro ao cancelar resultado' });
   }
 });
 

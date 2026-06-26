@@ -16,9 +16,12 @@
 
         <div v-for="g in ph.games" :key="g.id" class="match-card">
           <!-- Placar -->
-          <div class="match-score-row">
+          <div class="match-score-row" :class="{ live: g.status === 'EA' }">
             <span class="match-team">{{ g.home_team }}</span>
-            <span class="match-score">{{ g.home_score }} × {{ g.away_score }}</span>
+            <div class="match-score-col">
+              <span class="match-score">{{ g.home_score }} × {{ g.away_score }}</span>
+              <span v-if="g.status === 'EA'" class="live-tag">🔴 Ao vivo</span>
+            </div>
             <span class="match-team away">{{ g.away_team }}</span>
           </div>
 
@@ -120,6 +123,13 @@ function toggle(id) {
 }
 .match-team { font-weight: 700; font-size: 14px; flex: 1; text-align: right; }
 .match-team.away { text-align: left; }
+.match-score-row.live { background: #fff1f2; }
+.match-score-col { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+.live-tag {
+  font-size: 10px; font-weight: 700; color: #dc2626;
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
 .match-score {
   font-size: 22px;
   font-weight: 800;

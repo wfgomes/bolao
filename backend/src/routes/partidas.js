@@ -5,11 +5,11 @@ const { authMiddleware } = require('../middleware/auth');
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { rows: games } = await db.query(`
-      SELECT g.id, g.home_team, g.away_team, g.home_score, g.away_score, g.game_datetime,
+      SELECT g.id, g.home_team, g.away_team, g.home_score, g.away_score, g.game_datetime, g.status,
              p.display_name AS phase_display, p.order_num
       FROM games g
       JOIN phases p ON g.phase_id = p.id
-      WHERE g.is_finished = TRUE
+      WHERE g.status IN ('EA', 'FZ')
       ORDER BY p.order_num, g.game_datetime NULLS LAST
     `);
 

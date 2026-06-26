@@ -2,52 +2,69 @@
   <div>
     <h1 class="page-title">🏁 Resultados</h1>
 
-    <div v-if="loading" class="card" style="text-align:center;color:#888;padding:30px">Carregando...</div>
+    <div v-if="loading" class="card" style="text-align:center;color:#64748b;padding:30px">Carregando...</div>
 
     <template v-else>
       <div v-for="phaseGroup in grouped" :key="phaseGroup.phase" class="card">
         <h2 class="section-title">{{ phaseGroup.phase }}</h2>
-        <div v-for="g in phaseGroup.games" :key="g.id" class="result-row">
-          <div class="result-teams">
-            <span class="team">{{ g.home_team }}</span>
-            <div class="result-scores">
-              <input
-                type="number" min="0" max="99"
-                v-model.number="results[g.id].home"
-                class="score-input"
-                :class="{ finished: g.is_finished }"
-                placeholder="0"
-              />
-              <span class="vs">x</span>
-              <input
-                type="number" min="0" max="99"
-                v-model.number="results[g.id].away"
-                class="score-input"
-                :class="{ finished: g.is_finished }"
-                placeholder="0"
-              />
+
+        <div v-for="g in phaseGroup.games" :key="g.id" class="result-card">
+          <!-- Header: times + status -->
+          <div class="result-header">
+            <div class="result-teams-row">
+              <span class="r-team">{{ g.home_team }}</span>
+              <div class="r-inputs">
+                <input type="number" min="0" max="99" v-model.number="scores[g.id].home" class="r-score-input" placeholder="0" />
+                <span class="r-sep">×</span>
+                <input type="number" min="0" max="99" v-model.number="scores[g.id].away" class="r-score-input" placeholder="0" />
+              </div>
+              <span class="r-team away">{{ g.away_team }}</span>
             </div>
-            <span class="team away">{{ g.away_team }}</span>
+            <div class="result-badges">
+              <span v-if="g.status === 'EA'" class="badge-live">🔴 Ao vivo</span>
+              <span v-else-if="g.status === 'FZ'" class="badge badge-open">✅ Finalizado</span>
+              <span v-else class="badge badge-inactive">⏳ Pendente</span>
+              <span v-if="g.game_datetime" class="game-date">{{ fmtDate(g.game_datetime) }}</span>
+            </div>
           </div>
 
-          <div class="result-meta">
-            <span v-if="g.game_datetime" class="game-date">{{ fmtDate(g.game_datetime) }}</span>
-            <span v-if="g.is_finished" class="badge badge-locked">Finalizado</span>
+          <!-- Mensagem de status -->
+          <div v-if="statusMsg[g.id]" class="alert" :class="statusMsg[g.id].cls" style="margin-bottom:8px">
+            {{ statusMsg[g.id].msg }}
+          </div>
+
+          <!-- Botões de ação -->
+          <div class="result-actions">
             <button
-              @click="saveResult(g)"
-              class="btn btn-success btn-sm"
-              :disabled="saving[g.id]"
+              @click="saveEA(g)"
+              class="btn btn-warning btn-sm"
+              :disabled="busy[g.id]"
             >
-              {{ saving[g.id] ? '...' : g.is_finished ? 'Atualizar' : 'Salvar resultado' }}
+              {{ g.status === 'EA' ? '🔄 Atualizar' : '▶ Em Andamento' }}
             </button>
-          </div>
 
-          <div v-if="status[g.id]" class="alert" :class="status[g.id].cls" style="margin-top:6px;margin-bottom:0">
-            {{ status[g.id].msg }}
+            <button
+              v-if="g.status === 'EA'"
+              @click="finalizar(g)"
+              class="btn btn-success btn-sm"
+              :disabled="busy[g.id]"
+            >
+              ✅ Finalizar Jogo
+            </button>
+
+            <button
+              v-if="g.status === 'EA' || g.status === 'FZ'"
+              @click="cancelar(g)"
+              class="btn btn-danger btn-sm"
+              :disabled="busy[g.id]"
+            >
+              ✕ Cancelar Resultado
+            </button>
           </div>
         </div>
       </div>
-      <p v-if="games.length === 0" class="card" style="text-align:center;color:#888;padding:20px">
+
+      <p v-if="games.length === 0" class="card" style="text-align:center;color:#64748b;padding:20px">
         Nenhum jogo cadastrado.
       </p>
     </template>
@@ -58,11 +75,11 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import api from '../../api'
 
-const games   = ref([])
-const loading = ref(true)
-const saving  = reactive({})
-const status  = reactive({})
-const results = reactive({})
+const games     = ref([])
+const loading   = ref(true)
+const busy      = reactive({})
+const statusMsg = reactive({})
+const scores    = reactive({})
 
 const grouped = computed(() => {
   const map = {}
@@ -80,34 +97,44 @@ async function load() {
   try {
     games.value = (await api.get('/admin/games')).data
     games.value.forEach(g => {
-      results[g.id] = {
-        home: g.home_score ?? '',
-        away: g.away_score ?? '',
-      }
+      scores[g.id] = { home: g.home_score ?? '', away: g.away_score ?? '' }
     })
   } catch (e) { console.error(e) }
   finally { loading.value = false }
 }
 
-async function saveResult(g) {
-  const h = results[g.id].home
-  const a = results[g.id].away
-  if (h === '' || a === '') {
-    status[g.id] = { cls: 'alert-error', msg: 'Preencha o placar completo' }
-    return
-  }
-  saving[g.id] = true
-  status[g.id] = null
+async function saveEA(g) {
+  const h = scores[g.id].home, a = scores[g.id].away
+  if (h === '' || a === '') { setMsg(g.id, 'alert-error', 'Preencha o placar'); return }
+  await exec(g.id, () => api.put(`/admin/games/${g.id}/result`, { home_score: h, away_score: a }),
+    '🔴 Em andamento! Pontos recalculados.')
+}
+
+async function finalizar(g) {
+  if (!confirm(`Finalizar ${g.home_team} ${scores[g.id].home} × ${scores[g.id].away} ${g.away_team}?`)) return
+  await exec(g.id, () => api.put(`/admin/games/${g.id}/finalizar`), '✅ Jogo finalizado!')
+}
+
+async function cancelar(g) {
+  if (!confirm(`Cancelar o resultado de ${g.home_team} × ${g.away_team}? Os pontos serão removidos.`)) return
+  await exec(g.id, () => api.delete(`/admin/games/${g.id}/result`), '↩ Resultado cancelado.')
+}
+
+async function exec(id, fn, successMsg) {
+  busy[id] = true
+  statusMsg[id] = null
   try {
-    await api.put(`/admin/games/${g.id}/result`, { home_score: h, away_score: a })
-    status[g.id] = { cls: 'alert-success', msg: 'Resultado salvo! Pontos recalculados.' }
+    await fn()
+    setMsg(id, 'alert-success', successMsg)
     await load()
   } catch (e) {
-    status[g.id] = { cls: 'alert-error', msg: e.response?.data?.error || 'Erro' }
+    setMsg(id, 'alert-error', e.response?.data?.error || 'Erro')
   } finally {
-    saving[g.id] = false
+    busy[id] = false
   }
 }
+
+function setMsg(id, cls, msg) { statusMsg[id] = { cls, msg } }
 
 function fmtDate(dt) {
   return new Date(dt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
@@ -115,26 +142,40 @@ function fmtDate(dt) {
 </script>
 
 <style scoped>
-.result-row {
-  border: 1px solid #dee2e6;
-  border-radius: 10px;
-  padding: 12px 16px;
+.result-card {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
   margin-bottom: 10px;
   background: #fafafa;
 }
-.result-teams {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+.result-header { margin-bottom: 8px; }
+
+.result-teams-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
 }
-.team { font-weight: bold; font-size: 14px; flex: 1; text-align: right; }
-.away { text-align: left; }
-.result-scores { display: flex; align-items: center; gap: 6px; }
-.score-input {
-  width: 52px; padding: 6px 4px; border: 2px solid #198754;
-  border-radius: 8px; font-size: 20px; font-weight: bold;
-  text-align: center; color: #198754; outline: none;
+.r-team { font-weight: 700; font-size: 14px; flex: 1; text-align: right; }
+.r-team.away { text-align: left; }
+.r-inputs { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.r-score-input {
+  width: 50px; height: 46px;
+  border: 2px solid #16a34a; border-radius: 10px;
+  font-size: 20px; font-weight: 700;
+  text-align: center; color: #15803d; outline: none; background: #f0fdf4;
 }
-.score-input.finished { border-color: #aaa; color: #555; }
-.vs { font-weight: bold; color: #888; }
-.result-meta { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-.game-date { font-size: 12px; color: #888; flex: 1; }
+.r-score-input:focus { background: white; box-shadow: 0 0 0 3px rgba(22,163,74,.15); }
+.r-sep { font-size: 16px; font-weight: 700; color: #94a3b8; }
+
+.result-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.badge-live {
+  background: #dc2626; color: white;
+  font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+.badge-inactive { background: #f1f5f9; color: #94a3b8; }
+.game-date { font-size: 11px; color: #94a3b8; }
+
+.result-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 </style>

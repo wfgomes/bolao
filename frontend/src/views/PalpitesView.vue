@@ -92,7 +92,14 @@
             <span class="team-name away">{{ game.away_team }}</span>
           </div>
 
-          <div v-if="game.is_finished" class="game-result">
+          <div v-if="game.status === 'EA'" class="game-result live-result">
+            <span class="live-badge">🔴 Ao vivo</span>
+            <span class="result-label">{{ game.home_score }} × {{ game.away_score }}</span>
+            <span v-if="game.prediction?.points != null" class="badge" :class="ptsClass(game.prediction.points)">
+              {{ ptsLabel(game.prediction.points) }}
+            </span>
+          </div>
+          <div v-else-if="game.status === 'FZ'" class="game-result">
             <span class="result-label">Resultado: {{ game.home_score }} × {{ game.away_score }}</span>
             <span v-if="game.prediction?.points != null" class="badge" :class="ptsClass(game.prediction.points)">
               {{ ptsLabel(game.prediction.points) }}
@@ -268,6 +275,9 @@ function ptsLabel(pts) {
 .game-result { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; flex-wrap: wrap; }
 .result-label { color: #64748b; }
 .saved-label  { font-size: 12px; color: #16a34a; margin-top: 6px; font-weight: 600; }
+.live-result  { background: #fff1f2; border-radius: 8px; padding: 5px 8px; }
+.live-badge   { font-size: 11px; font-weight: 700; color: #dc2626; animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
 
 .save-row { margin-top: 14px; }
 </style>
