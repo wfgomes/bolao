@@ -15,6 +15,7 @@
         <template v-if="!auth.isAdmin">
           <router-link to="/">🏆 Classificação</router-link>
           <router-link to="/palpites">⚽ Meus Palpites</router-link>
+          <router-link to="/partidas">📊 Acertos</router-link>
         </template>
         <template v-else>
           <router-link to="/admin/jogos">Jogos</router-link>
@@ -23,6 +24,7 @@
           <router-link to="/admin/usuarios">Usuários</router-link>
           <router-link to="/admin/classificacao">Classificação</router-link>
           <router-link to="/admin/artilheiros">Artilheiros</router-link>
+          <router-link to="/partidas">📊 Acertos</router-link>
         </template>
       </div>
     </nav>
@@ -40,6 +42,10 @@
       <router-link to="/palpites" class="bnav-item">
         <span class="bnav-icon">⚽</span>
         <span>Palpites</span>
+      </router-link>
+      <router-link to="/partidas" class="bnav-item">
+        <span class="bnav-icon">📊</span>
+        <span>Acertos</span>
       </router-link>
     </nav>
 
