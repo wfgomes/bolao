@@ -2,40 +2,49 @@
   <div>
     <h1 class="page-title">🏆 Classificação</h1>
 
-    <div v-if="loading" class="card" style="text-align:center;color:#888;padding:30px">
+    <div v-if="loading" class="card" style="text-align:center;color:#64748b;padding:30px">
       Carregando...
     </div>
 
-    <div v-else class="card">
-      <div v-if="standings.length === 0" style="text-align:center;color:#888;padding:20px">
-        Nenhuma pontuação registrada ainda.
+    <div v-else class="card" style="padding:12px">
+      <div v-if="standings.length === 0" style="text-align:center;color:#64748b;padding:20px">
+        Nenhuma pontuação ainda.
       </div>
+
       <div
         v-for="(p, i) in standings"
         :key="p.id"
         class="rank-row"
-        :class="{ gold: i === 0, silver: i === 1, bronze: i === 2 }"
+        :class="{ gold: i===0, silver: i===1, bronze: i===2 }"
       >
-        <span class="rank-pos">{{ i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1 }}</span>
-        <span class="rank-name">{{ p.name }}</span>
-        <div class="rank-right">
-          <span class="rank-pts">{{ p.points }} <small>pts</small></span>
-          <span class="rank-detail">🎯 {{ p.exact_scores }} &nbsp;✅ {{ p.correct_outcomes }} &nbsp;❌ {{ p.wrong }}</span>
-          <span v-if="p.artilheiro_name" class="rank-art">
-            ⚽ {{ p.artilheiro_name }} — {{ p.artilheiro_goals }} gol{{ p.artilheiro_goals !== 1 ? 's' : '' }}
-          </span>
+        <span class="rank-pos">{{ i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1 }}</span>
+
+        <div class="rank-info">
+          <span class="rank-name">{{ p.name }}</span>
+          <div class="rank-meta">
+            <span class="rank-stat">🎯 {{ p.exact_scores }}</span>
+            <span class="rank-stat">✅ {{ p.correct_outcomes }}</span>
+            <span class="rank-stat">❌ {{ p.wrong }}</span>
+            <span v-if="p.artilheiro_name" class="rank-art">
+              ⚽ {{ p.artilheiro_name }} ({{ p.artilheiro_goals }})
+            </span>
+          </div>
         </div>
+
+        <span class="rank-pts">
+          {{ p.points }}<small>pts</small>
+        </span>
       </div>
     </div>
 
     <div v-if="lockedPhases.length > 0" class="card">
       <h2 class="section-title">Ver palpites por fase</h2>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div class="phase-btns">
         <router-link
           v-for="phase in lockedPhases"
           :key="phase.id"
           :to="`/ver-palpites/${phase.id}`"
-          class="btn btn-primary btn-sm"
+          class="btn btn-ghost btn-sm"
         >
           {{ phase.display_name }}
         </router-link>
@@ -71,20 +80,38 @@ onMounted(async () => {
 .rank-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid #dee2e6;
+  gap: 10px;
+  padding: 12px 10px;
   border-radius: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  transition: background .15s;
 }
-.gold   { border-left: 4px solid #FFD700; }
-.silver { border-left: 4px solid #A8A8A8; }
-.bronze { border-left: 4px solid #CD7F32; }
-.rank-pos  { font-size: 22px; min-width: 36px; text-align: center; }
-.rank-name { flex: 1; font-weight: bold; font-size: 15px; }
-.rank-right { text-align: right; }
-.rank-pts  { font-size: 18px; font-weight: bold; color: #198754; display: block; }
-.rank-pts small { font-size: 11px; color: #888; font-weight: normal; }
-.rank-detail { font-size: 12px; color: #888; }
-.rank-art    { font-size: 11px; color: #198754; display: block; }
+.rank-row:hover { background: #f8fafc; }
+.gold   { border-left: 4px solid #f59e0b; background: #fffbeb; }
+.silver { border-left: 4px solid #94a3b8; background: #f8fafc; }
+.bronze { border-left: 4px solid #b45309; background: #fffbeb; }
+
+.rank-pos { font-size: 24px; min-width: 36px; text-align: center; flex-shrink: 0; }
+
+.rank-info { flex: 1; min-width: 0; }
+.rank-name { font-weight: 700; font-size: 15px; color: #0f172a; display: block; margin-bottom: 3px; }
+.rank-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.rank-stat { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 1px 7px; border-radius: 8px; }
+.rank-art  { font-size: 12px; color: #16a34a; background: #f0fdf4; padding: 1px 7px; border-radius: 8px; }
+
+.rank-pts {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1d4ed8;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.rank-pts small {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  margin-left: 1px;
+}
+
+.phase-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 </style>

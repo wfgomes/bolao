@@ -1,22 +1,35 @@
 <template>
-  <div class="login-wrapper">
+  <div class="login-page">
     <div class="login-card">
       <div class="login-logo">⚽</div>
-      <h1>Bolão Copa 2026</h1>
-      <p class="subtitle">Entre com seus dados para participar</p>
+      <h1 class="login-title">Bolão dos Amigos</h1>
+      <p class="login-sub">Copa do Mundo 2026</p>
 
       <div v-if="error" class="alert alert-error">{{ error }}</div>
 
-      <form @submit.prevent="handleLogin">
+      <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
           <label>Usuário</label>
-          <input v-model="username" class="form-control" placeholder="seu.usuario" autocomplete="username" required />
+          <input
+            v-model="username"
+            class="form-control"
+            placeholder="seu.usuario"
+            autocomplete="username"
+            required
+          />
         </div>
         <div class="form-group">
           <label>Senha</label>
-          <input v-model="password" type="password" class="form-control" placeholder="••••••" autocomplete="current-password" required />
+          <input
+            v-model="password"
+            type="password"
+            class="form-control"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          />
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px" :disabled="loading">
+        <button type="submit" class="btn btn-primary btn-full" :disabled="loading">
           {{ loading ? 'Entrando...' : 'Entrar' }}
         </button>
       </form>
@@ -44,7 +57,7 @@ async function handleLogin() {
     await auth.login(username.value, password.value)
     router.push(auth.isAdmin ? '/admin' : '/')
   } catch (e) {
-    error.value = e.response?.data?.error || 'Erro ao fazer login'
+    error.value = e.response?.data?.error || 'Usuário ou senha incorretos'
   } finally {
     loading.value = false
   }
@@ -52,23 +65,40 @@ async function handleLogin() {
 </script>
 
 <style scoped>
-.login-wrapper {
+.login-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  background: linear-gradient(160deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
 }
 .login-card {
   background: white;
-  border-radius: 16px;
-  padding: 40px 32px;
+  border-radius: 20px;
+  padding: 36px 28px 32px;
   width: 100%;
-  max-width: 380px;
-  box-shadow: 0 4px 24px rgba(0,0,0,.12);
+  max-width: 360px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
   text-align: center;
 }
-.login-logo { font-size: 48px; margin-bottom: 8px; }
-h1 { font-size: 22px; color: #0d6efd; margin-bottom: 6px; }
-.subtitle { color: #888; font-size: 14px; margin-bottom: 28px; }
+.login-logo {
+  font-size: 52px;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.15));
+}
+.login-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 4px;
+  letter-spacing: -.5px;
+}
+.login-sub {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 28px;
+  font-weight: 500;
+}
+.login-form { text-align: left; }
 </style>
