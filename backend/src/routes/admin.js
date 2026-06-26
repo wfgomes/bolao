@@ -7,10 +7,10 @@ router.use(adminMiddleware);
 
 function calcPoints(ph, pa, rh, ra) {
   ph = Number(ph); pa = Number(pa); rh = Number(rh); ra = Number(ra);
-  if (ph === rh && pa === ra) return 10;
+  if (ph === rh && pa === ra) return 3;
   const po = ph > pa ? 1 : ph < pa ? -1 : 0;
   const ro = rh > ra ? 1 : rh < ra ? -1 : 0;
-  return po === ro ? 5 : 0;
+  return po === ro ? 1 : 0;
 }
 
 // ── Users ──────────────────────────────────────────────────────────────
@@ -223,8 +223,8 @@ router.get('/standings', async (req, res) => {
       SELECT
         u.id, u.name,
         COALESCE(SUM(pr.points), 0)::int                    AS points,
-        COUNT(CASE WHEN pr.points = 10 THEN 1 END)::int     AS exact_scores,
-        COUNT(CASE WHEN pr.points = 5  THEN 1 END)::int     AS correct_outcomes,
+        COUNT(CASE WHEN pr.points = 3 THEN 1 END)::int     AS exact_scores,
+        COUNT(CASE WHEN pr.points = 1 THEN 1 END)::int     AS correct_outcomes,
         COUNT(CASE WHEN pr.points = 0  THEN 1 END)::int     AS wrong,
         COUNT(pr.id)::int                                   AS total_predictions
       FROM users u

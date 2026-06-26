@@ -9,8 +9,8 @@ router.get('/', authMiddleware, async (req, res) => {
         u.id,
         u.name,
         COALESCE(SUM(pr.points), 0)::int                                   AS points,
-        COUNT(CASE WHEN pr.points = 10 THEN 1 END)::int                    AS exact_scores,
-        COUNT(CASE WHEN pr.points = 5  THEN 1 END)::int                    AS correct_outcomes,
+        COUNT(CASE WHEN pr.points = 3 THEN 1 END)::int                    AS exact_scores,
+        COUNT(CASE WHEN pr.points = 1 THEN 1 END)::int                    AS correct_outcomes,
         COUNT(CASE WHEN pr.points = 0  THEN 1 END)::int                    AS wrong,
         COUNT(pr.id)::int                                                   AS total_predictions
       FROM users u

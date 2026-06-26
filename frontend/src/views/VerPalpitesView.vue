@@ -53,15 +53,15 @@ onMounted(async () => {
 })
 
 function ptsClass(pts) {
-  if (pts === 10) return 'badge-exact'
-  if (pts === 5)  return 'badge-partial'
-  if (pts === 0)  return 'badge-wrong'
+  if (pts === 3) return 'badge-exact'
+  if (pts === 1) return 'badge-partial'
+  if (pts === 0) return 'badge-wrong'
   return ''
 }
 function ptsLabel(pts) {
-  if (pts === 10) return '🎯 +10'
-  if (pts === 5)  return '✅ +5'
-  if (pts === 0)  return '❌ 0'
+  if (pts === 3) return '🎯 +3'
+  if (pts === 1) return '✅ +1'
+  if (pts === 0) return '❌ 0'
   return ''
 }
 </script>

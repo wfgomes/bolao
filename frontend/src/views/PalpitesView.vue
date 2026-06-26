@@ -141,15 +141,15 @@ function fmtDate(dt) {
   return new Date(dt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 function ptsClass(pts) {
-  if (pts === 10) return 'pts-exact'
-  if (pts === 5)  return 'pts-partial'
-  if (pts === 0)  return 'pts-wrong'
+  if (pts === 3) return 'pts-exact'
+  if (pts === 1) return 'pts-partial'
+  if (pts === 0) return 'pts-wrong'
   return ''
 }
 function ptsLabel(pts) {
-  if (pts === 10) return '🎯 Placar exato +10'
-  if (pts === 5)  return '✅ Resultado certo +5'
-  if (pts === 0)  return '❌ Errou 0'
+  if (pts === 3) return '🎯 Placar exato +3'
+  if (pts === 1) return '✅ Vencedor certo +1'
+  if (pts === 0) return '❌ Errou 0'
   return ''
 }
 </script>
