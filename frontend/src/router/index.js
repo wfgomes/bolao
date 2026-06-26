@@ -21,6 +21,7 @@ const routes = [
       { path: 'jogos',      component: () => import('../views/admin/AdminGames.vue') },
       { path: 'resultados', component: () => import('../views/admin/AdminResults.vue') },
       { path: 'classificacao', component: () => import('../views/admin/AdminStandings.vue') },
+      { path: 'artilheiros',  component: () => import('../views/admin/AdminArtilheiros.vue') },
     ],
   },
   { path: '/:pathMatch(.*)*', redirect: '/' },

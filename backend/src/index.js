@@ -12,6 +12,7 @@ app.use('/api/auth',        require('./routes/auth'));
 app.use('/api/games',       require('./routes/games'));
 app.use('/api/predictions', require('./routes/predictions'));
 app.use('/api/standings',   require('./routes/standings'));
+app.use('/api/artilheiro',  require('./routes/artilheiro'));
 app.use('/api/admin',       require('./routes/admin'));
 
 // Serve Vue frontend in production

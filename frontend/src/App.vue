@@ -14,6 +14,7 @@
             <router-link to="/admin/fases">Fases</router-link>
             <router-link to="/admin/usuarios">Usuários</router-link>
             <router-link to="/admin/classificacao">Classificação</router-link>
+            <router-link to="/admin/artilheiros">Artilheiros</router-link>
           </template>
           <button @click="logout" class="btn-logout">Sair ({{ auth.user?.name }})</button>
         </div>

@@ -2,6 +2,47 @@
   <div>
     <h1 class="page-title">⚽ Meus Palpites</h1>
 
+    <!-- Artilheiro -->
+    <div v-if="!artLoading" class="card">
+      <div class="phase-header">
+        <h2>🥇 Artilheiro da Copa</h2>
+        <span class="badge" :class="artData.is_locked ? 'badge-locked' : 'badge-open'">
+          {{ artData.is_locked ? '🔒 Travado' : '🟢 Aberto' }}
+        </span>
+      </div>
+
+      <div v-if="artData.is_locked && artData.user_choice" class="alert alert-info">
+        Sua escolha: <strong>{{ artData.user_choice.artilheiro_name }}</strong>
+        ({{ artData.user_choice.team }}) —
+        <strong>{{ artData.user_choice.goals }} gol{{ artData.user_choice.goals !== 1 ? 's' : '' }}</strong>
+        = <strong>+{{ artData.user_choice.goals }} pts</strong>
+      </div>
+      <div v-else-if="artData.is_locked && !artData.user_choice" class="alert alert-warning">
+        Você não escolheu um artilheiro.
+      </div>
+
+      <div v-if="!artData.is_locked">
+        <div class="form-group">
+          <label>Escolha seu artilheiro</label>
+          <select v-model.number="selectedArtilheiro" class="form-control">
+            <option value="" disabled>Selecione um jogador...</option>
+            <option v-for="a in artData.artilheiros" :key="a.id" :value="a.id">
+              {{ a.name }} {{ a.team ? `(${a.team})` : '' }}
+            </option>
+          </select>
+        </div>
+        <div v-if="artStatus" class="alert" :class="artStatus.cls">{{ artStatus.msg }}</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <button @click="saveArtilheiro" class="btn btn-primary" :disabled="artSaving || !selectedArtilheiro">
+            {{ artSaving ? 'Salvando...' : 'Confirmar artilheiro' }}
+          </button>
+          <span v-if="artData.user_choice" style="color:#555;font-size:14px">
+            Atual: <strong>{{ artData.user_choice.artilheiro_name }}</strong>
+          </span>
+        </div>
+      </div>
+    </div>
+
     <div v-if="loading" class="card" style="text-align:center;color:#888;padding:30px">Carregando jogos...</div>
 
     <div v-else-if="phases.length === 0" class="card" style="text-align:center;color:#888;padding:30px">
@@ -85,7 +126,37 @@ const preds   = reactive({})
 const saving  = reactive({})
 const status  = reactive({})
 
-onMounted(load)
+const artData           = ref({ artilheiros: [], user_choice: null, is_locked: false })
+const artLoading        = ref(true)
+const selectedArtilheiro = ref('')
+const artSaving         = ref(false)
+const artStatus         = ref(null)
+
+onMounted(() => { load(); loadArtilheiro() })
+
+async function loadArtilheiro() {
+  artLoading.value = true
+  try {
+    const { data } = await api.get('/artilheiro')
+    artData.value = data
+    if (data.user_choice) selectedArtilheiro.value = data.user_choice.artilheiro_id
+  } catch (e) { console.error(e) }
+  finally { artLoading.value = false }
+}
+
+async function saveArtilheiro() {
+  artSaving.value = true
+  artStatus.value = null
+  try {
+    await api.post('/artilheiro', { artilheiro_id: selectedArtilheiro.value })
+    artStatus.value = { cls: 'alert-success', msg: 'Artilheiro salvo!' }
+    await loadArtilheiro()
+  } catch (e) {
+    artStatus.value = { cls: 'alert-error', msg: e.response?.data?.error || 'Erro ao salvar' }
+  } finally {
+    artSaving.value = false
+  }
+}
 
 async function load() {
   try {

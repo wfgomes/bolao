@@ -21,6 +21,9 @@
         <div class="rank-right">
           <span class="rank-pts">{{ p.points }} <small>pts</small></span>
           <span class="rank-detail">🎯 {{ p.exact_scores }} &nbsp;✅ {{ p.correct_outcomes }} &nbsp;❌ {{ p.wrong }}</span>
+          <span v-if="p.artilheiro_name" class="rank-art">
+            ⚽ {{ p.artilheiro_name }} — {{ p.artilheiro_goals }} gol{{ p.artilheiro_goals !== 1 ? 's' : '' }}
+          </span>
         </div>
       </div>
     </div>
@@ -83,4 +86,5 @@ onMounted(async () => {
 .rank-pts  { font-size: 18px; font-weight: bold; color: #198754; display: block; }
 .rank-pts small { font-size: 11px; color: #888; font-weight: normal; }
 .rank-detail { font-size: 12px; color: #888; }
+.rank-art    { font-size: 11px; color: #198754; display: block; }
 </style>
