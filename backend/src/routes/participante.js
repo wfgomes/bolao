@@ -18,14 +18,15 @@ router.get('/:userId', authMiddleware, async (req, res) => {
     if (!users[0]) return res.status(404).json({ error: 'Participante não encontrado' });
 
     const { rows: phases } = await db.query('SELECT * FROM phases ORDER BY order_num');
-    const lockedPhaseIds = phases.filter(isLocked).map(p => p.id);
-
-    // Próprio usuário vê tudo; outros veem só fases travadas
-    const viewingOwn = Number(userId) === req.user.id;
-    const phaseIds = viewingOwn ? phases.map(p => p.id) : lockedPhaseIds;
+    const phaseIds = phases.filter(isLocked).map(p => p.id);
 
     if (phaseIds.length === 0) {
-      return res.json({ user: users[0], phases: [], artilheiro: null });
+      return res.json({
+        user: users[0],
+        stats: { points: 0, exact_scores: 0, correct_outcomes: 0, wrong: 0 },
+        phases: [],
+        artilheiro: null,
+      });
     }
 
     const { rows: preds } = await db.query(`

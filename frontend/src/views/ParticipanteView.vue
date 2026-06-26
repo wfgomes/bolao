@@ -18,19 +18,19 @@
         <div class="profile-name">{{ data.user.name }}</div>
         <div class="profile-stats">
           <div class="stat-chip">
-            <span class="stat-val">{{ data.stats.points }}</span>
+            <span class="stat-val">{{ data.stats?.points ?? 0 }}</span>
             <span class="stat-lbl">pontos</span>
           </div>
           <div class="stat-chip">
-            <span class="stat-val">🎯{{ data.stats.exact_scores }}</span>
+            <span class="stat-val">🎯{{ data.stats?.exact_scores ?? 0 }}</span>
             <span class="stat-lbl">exatos</span>
           </div>
           <div class="stat-chip">
-            <span class="stat-val">✅{{ data.stats.correct_outcomes }}</span>
+            <span class="stat-val">✅{{ data.stats?.correct_outcomes ?? 0 }}</span>
             <span class="stat-lbl">resultado</span>
           </div>
           <div class="stat-chip">
-            <span class="stat-val">❌{{ data.stats.wrong }}</span>
+            <span class="stat-val">❌{{ data.stats?.wrong ?? 0 }}</span>
             <span class="stat-lbl">errou</span>
           </div>
         </div>
