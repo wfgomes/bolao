@@ -41,7 +41,8 @@ body {
 }
 .header-brand { font-weight: 700; font-size: 17px; letter-spacing: -.3px; }
 .header-right { display: flex; align-items: center; gap: 10px; }
-.header-user  { font-size: 13px; color: rgba(255,255,255,.75); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.header-user  { font-size: 13px; color: rgba(255,255,255,.75); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration: none; }
+.header-user:hover { color: white; text-decoration: underline; }
 .btn-logout {
   background: rgba(255,255,255,.15);
   border: 1px solid rgba(255,255,255,.25);

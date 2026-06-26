@@ -4,7 +4,7 @@
     <header v-if="auth.token" class="top-header">
       <span class="header-brand">⚽ Bolão dos Amigos</span>
       <div class="header-right">
-        <span class="header-user">{{ auth.user?.name }}</span>
+        <router-link to="/perfil" class="header-user">{{ auth.user?.name }}</router-link>
         <button @click="logout" class="btn-logout">Sair</button>
       </div>
     </header>

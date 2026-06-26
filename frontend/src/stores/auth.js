@@ -29,5 +29,13 @@ export const useAuthStore = defineStore('auth', () => {
     delete api.defaults.headers.common['Authorization']
   }
 
-  return { token, user, isAdmin, login, logout }
+  function updateUser(newToken, newUser) {
+    token.value = newToken
+    user.value  = newUser
+    localStorage.setItem('token', newToken)
+    localStorage.setItem('user', JSON.stringify(newUser))
+    api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
+  }
+
+  return { token, user, isAdmin, login, logout, updateUser }
 })
