@@ -51,14 +51,15 @@ router.get('/:userId', authMiddleware, async (req, res) => {
     // Pontuação total
     const { rows: pts } = await db.query(`
       SELECT
-        (COALESCE(SUM(pr.points), 0) + COALESCE(a.goals, 0))::int AS points,
+        (COALESCE(SUM(pr.points), 0) + COALESCE(
+          (SELECT a.goals FROM user_artilheiro ua
+           JOIN artilheiros a ON ua.artilheiro_id = a.id
+           WHERE ua.user_id = $1 LIMIT 1), 0
+        ))::int AS points,
         COUNT(CASE WHEN pr.points = 3 THEN 1 END)::int AS exact_scores,
         COUNT(CASE WHEN pr.points = 1 THEN 1 END)::int AS correct_outcomes,
         COUNT(CASE WHEN pr.points = 0 THEN 1 END)::int AS wrong
       FROM predictions pr
-      JOIN games g ON pr.game_id = g.id
-      LEFT JOIN user_artilheiro ua ON ua.user_id = pr.user_id
-      LEFT JOIN artilheiros a ON ua.artilheiro_id = a.id
       WHERE pr.user_id = $1
     `, [userId]);
 
