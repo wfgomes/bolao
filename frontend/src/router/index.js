@@ -11,6 +11,7 @@ const routes = [
   { path: '/palpites', component: () => import('../views/PalpitesView.vue') },
   { path: '/ver-palpites/:phaseId', component: () => import('../views/VerPalpitesView.vue') },
   { path: '/partidas',             component: () => import('../views/PartidasView.vue') },
+  { path: '/participante/:userId', component: () => import('../views/ParticipanteView.vue') },
   {
     path: '/admin',
     component: () => import('../views/admin/AdminLayout.vue'),

@@ -14,7 +14,8 @@ app.use('/api/predictions', require('./routes/predictions'));
 app.use('/api/standings',   require('./routes/standings'));
 app.use('/api/artilheiro',  require('./routes/artilheiro'));
 app.use('/api/partidas',    require('./routes/partidas'));
-app.use('/api/admin',       require('./routes/admin'));
+app.use('/api/admin',        require('./routes/admin'));
+app.use('/api/participante', require('./routes/participante'));
 
 // Serve Vue frontend in production
 if (process.env.NODE_ENV === 'production') {

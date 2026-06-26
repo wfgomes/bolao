@@ -20,7 +20,7 @@
         <span class="rank-pos">{{ i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1 }}</span>
 
         <div class="rank-info">
-          <span class="rank-name">{{ p.name }}</span>
+          <router-link :to="`/participante/${p.id}`" class="rank-name">{{ p.name }}</router-link>
           <div class="rank-meta">
             <span class="rank-stat">🎯 {{ p.exact_scores }}</span>
             <span class="rank-stat">✅ {{ p.correct_outcomes }}</span>
@@ -94,7 +94,12 @@ onMounted(async () => {
 .rank-pos { font-size: 24px; min-width: 36px; text-align: center; flex-shrink: 0; }
 
 .rank-info { flex: 1; min-width: 0; }
-.rank-name { font-weight: 700; font-size: 15px; color: #0f172a; display: block; margin-bottom: 3px; }
+.rank-name {
+  font-weight: 700; font-size: 15px; color: #0f172a;
+  display: block; margin-bottom: 3px;
+  text-decoration: none;
+}
+.rank-name:hover { color: #1d4ed8; text-decoration: underline; }
 .rank-meta { display: flex; flex-wrap: wrap; gap: 6px; }
 .rank-stat { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 1px 7px; border-radius: 8px; }
 .rank-art  { font-size: 12px; color: #16a34a; background: #f0fdf4; padding: 1px 7px; border-radius: 8px; }
