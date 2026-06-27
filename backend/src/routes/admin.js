@@ -231,7 +231,7 @@ router.delete('/games/:id/result', async (req, res) => {
 
 // ── Predictions (admin view) ───────────────────────────────────────────
 router.get('/predictions', async (req, res) => {
-  const { phase_id } = req.query;
+  const { phase_id, user_id } = req.query;
   try {
     let query = `
       SELECT pr.*, u.name AS user_name, g.home_team, g.away_team,
@@ -245,6 +245,7 @@ router.get('/predictions', async (req, res) => {
     `;
     const params = [];
     if (phase_id) { params.push(phase_id); query += ` AND p.id = $${params.length}`; }
+    if (user_id)  { params.push(user_id);  query += ` AND pr.user_id = $${params.length}`; }
     query += ' ORDER BY p.order_num, g.game_datetime NULLS LAST, u.name';
     const { rows } = await db.query(query, params);
     res.json(rows);
