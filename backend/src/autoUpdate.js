@@ -72,6 +72,7 @@ const ARTILHEIRO_MAP = {
   'Lautaro Martínez': 'Lautaro Martínez',
   'Julian Álvarez':  'Julián Álvarez',
   'Enner Valencia':  'Enner Valencia',
+  'Dembélé': 'Ousmane Dembélé'
 };
 
 const STATUS_MAP = {
