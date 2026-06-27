@@ -55,6 +55,66 @@ body {
 }
 .btn-logout:hover { background: rgba(255,255,255,.25); }
 
+/* ── App wrapper ─────────────────────────────────────── */
+.app-wrapper { position: relative; }
+
+/* ── Hamburger (só mobile, só admin) ─────────────────── */
+.btn-hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 7px 8px;
+}
+.btn-hamburger span {
+  display: block;
+  height: 2px;
+  background: white;
+  border-radius: 2px;
+  transition: transform .2s, opacity .2s;
+}
+.btn-hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.btn-hamburger.active span:nth-child(2) { opacity: 0; }
+.btn-hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (min-width: 640px) {
+  .btn-hamburger { display: none; }
+}
+
+/* ── Admin mobile dropdown menu ──────────────────────── */
+.admin-mobile-menu {
+  position: absolute;
+  top: 52px;
+  left: 0; right: 0;
+  background: var(--primary-dk);
+  z-index: 190;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 20px rgba(0,0,0,.3);
+}
+.admin-mobile-menu a {
+  color: rgba(255,255,255,.85);
+  text-decoration: none;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: block;
+}
+.admin-mobile-menu a:last-child { border-bottom: none; }
+.admin-mobile-menu a:hover,
+.admin-mobile-menu a.router-link-active { background: rgba(255,255,255,.12); color: white; }
+
+@media (min-width: 640px) {
+  .admin-mobile-menu { display: none; }
+}
+
 /* ── Desktop Nav (oculta no mobile) ──────────────────── */
 .desktop-nav {
   background: var(--primary);
