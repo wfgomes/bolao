@@ -18,9 +18,13 @@ async function firstPhaseLocked() {
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const [artRes, choiceRes, locked] = await Promise.all([
-      db.query('SELECT * FROM artilheiros ORDER BY goals DESC, name'),
       db.query(`
-        SELECT ua.*, a.name AS artilheiro_name, a.team, a.goals
+        SELECT *, GREATEST(goals - goals_offset, 0) AS effective_goals
+        FROM artilheiros ORDER BY effective_goals DESC, name
+      `),
+      db.query(`
+        SELECT ua.*, a.name AS artilheiro_name, a.team, a.goals, a.goals_offset,
+               GREATEST(a.goals - a.goals_offset, 0) AS effective_goals
         FROM user_artilheiro ua
         JOIN artilheiros a ON ua.artilheiro_id = a.id
         WHERE ua.user_id = $1
@@ -66,7 +70,8 @@ router.get('/all', authMiddleware, async (req, res) => {
     }
     const { rows } = await db.query(`
       SELECT u.id, u.name AS user_name,
-             a.name AS artilheiro_name, a.team, a.goals
+             a.name AS artilheiro_name, a.team, a.goals, a.goals_offset,
+             GREATEST(COALESCE(a.goals, 0) - COALESCE(a.goals_offset, 0), 0) AS effective_goals
       FROM users u
       LEFT JOIN user_artilheiro ua ON u.id = ua.user_id
       LEFT JOIN artilheiros a ON ua.artilheiro_id = a.id

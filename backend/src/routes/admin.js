@@ -257,21 +257,23 @@ router.get('/standings', async (req, res) => {
     const { rows } = await db.query(`
       SELECT
         u.id, u.name,
-        (COALESCE(SUM(pr.points), 0) + COALESCE(art.goals, 0))::int AS points,
-        COALESCE(SUM(pr.points), 0)::int                             AS prediction_points,
-        COALESCE(art.goals, 0)::int                                  AS artilheiro_points,
+        (COALESCE(SUM(pr.points), 0) + GREATEST(COALESCE(art.goals, 0) - COALESCE(art.goals_offset, 0), 0))::int AS points,
+        COALESCE(SUM(pr.points), 0)::int                                                                          AS prediction_points,
+        GREATEST(COALESCE(art.goals, 0) - COALESCE(art.goals_offset, 0), 0)::int                                 AS artilheiro_points,
         COUNT(CASE WHEN pr.points = 3 THEN 1 END)::int               AS exact_scores,
         COUNT(CASE WHEN pr.points = 1 THEN 1 END)::int               AS correct_outcomes,
         COUNT(CASE WHEN pr.points = 0 THEN 1 END)::int               AS wrong,
         COUNT(pr.id)::int                                             AS total_predictions,
         art.name                                                      AS artilheiro_name,
-        art.goals                                                     AS artilheiro_goals
+        art.goals                                                     AS artilheiro_goals,
+        art.goals_offset                                              AS artilheiro_goals_offset,
+        GREATEST(COALESCE(art.goals, 0) - COALESCE(art.goals_offset, 0), 0)::int AS artilheiro_effective_goals
       FROM users u
       LEFT JOIN predictions pr ON u.id = pr.user_id
       LEFT JOIN user_artilheiro ua ON u.id = ua.user_id
       LEFT JOIN artilheiros art ON ua.artilheiro_id = art.id
       WHERE u.active = TRUE AND u.is_admin = FALSE
-      GROUP BY u.id, u.name, art.name, art.goals
+      GROUP BY u.id, u.name, art.name, art.goals, art.goals_offset
       ORDER BY points DESC, exact_scores DESC, u.name
     `);
     res.json(rows);
@@ -281,33 +283,37 @@ router.get('/standings', async (req, res) => {
 // ── Artilheiros (admin) ───────────────────────────────────────────────
 router.get('/artilheiros', async (req, res) => {
   try {
-    const { rows } = await db.query('SELECT * FROM artilheiros ORDER BY goals DESC, name');
+    const { rows } = await db.query(`
+      SELECT *, GREATEST(goals - goals_offset, 0) AS effective_goals
+      FROM artilheiros ORDER BY effective_goals DESC, name
+    `);
     res.json(rows);
   } catch (e) { res.status(500).json({ error: 'Erro' }); }
 });
 
 router.post('/artilheiros', async (req, res) => {
-  const { name, team, goals = 0 } = req.body;
+  const { name, team, goals = 0, goals_offset = 0 } = req.body;
   if (!name) return res.status(400).json({ error: 'Nome obrigatório' });
   try {
     const { rows } = await db.query(
-      'INSERT INTO artilheiros (name, team, goals) VALUES ($1, $2, $3) RETURNING *',
-      [name, team || null, goals]
+      'INSERT INTO artilheiros (name, team, goals, goals_offset) VALUES ($1, $2, $3, $4) RETURNING *, GREATEST(goals - goals_offset, 0) AS effective_goals',
+      [name, team || null, goals, goals_offset]
     );
     res.json(rows[0]);
   } catch (e) { res.status(500).json({ error: 'Erro ao criar artilheiro' }); }
 });
 
 router.put('/artilheiros/:id', async (req, res) => {
-  const { name, team, goals } = req.body;
+  const { name, team, goals, goals_offset } = req.body;
   try {
     const { rows } = await db.query(
       `UPDATE artilheiros SET
-        name  = COALESCE($1, name),
-        team  = COALESCE($2, team),
-        goals = COALESCE($3, goals)
-       WHERE id = $4 RETURNING *`,
-      [name, team, goals, req.params.id]
+        name         = COALESCE($1, name),
+        team         = COALESCE($2, team),
+        goals        = COALESCE($3, goals),
+        goals_offset = COALESCE($4, goals_offset)
+       WHERE id = $5 RETURNING *, GREATEST(goals - goals_offset, 0) AS effective_goals`,
+      [name, team, goals, goals_offset, req.params.id]
     );
     res.json(rows[0]);
   } catch (e) { res.status(500).json({ error: 'Erro ao atualizar artilheiro' }); }

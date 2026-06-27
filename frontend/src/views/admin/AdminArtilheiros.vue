@@ -16,14 +16,21 @@
           <input v-model="form.team" class="form-control" placeholder="Brasil" />
         </div>
         <div class="form-group">
-          <label>Gols marcados</label>
+          <label>Gols marcados (total API)</label>
           <input v-model.number="form.goals" type="number" min="0" class="form-control" required />
         </div>
-        <div style="display:flex;align-items:flex-end;gap:8px">
+        <div class="form-group">
+          <label>Base (gols antes do bolão)</label>
+          <input v-model.number="form.goals_offset" type="number" min="0" class="form-control" required />
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;grid-column:1/-1">
           <button type="submit" class="btn btn-primary" :disabled="saving">
             {{ saving ? 'Salvando...' : editing ? 'Salvar' : 'Adicionar' }}
           </button>
           <button v-if="editing" type="button" @click="cancelEdit" class="btn btn-secondary">Cancelar</button>
+          <span v-if="form.goals_offset > 0 || form.goals > 0" style="font-size:13px;color:#64748b">
+            Gols no bolão: <strong>{{ Math.max(form.goals - form.goals_offset, 0) }}</strong>
+          </span>
         </div>
       </form>
     </div>
@@ -36,7 +43,9 @@
           <tr>
             <th>Jogador</th>
             <th>Seleção</th>
-            <th>Gols</th>
+            <th title="Gols totais na API">API</th>
+            <th title="Gols antes do bolão (não contam)">Base</th>
+            <th title="Gols que contam para o bolão">Bolão</th>
             <th></th>
           </tr>
         </thead>
@@ -44,8 +53,10 @@
           <tr v-for="a in artilheiros" :key="a.id">
             <td><strong>{{ a.name }}</strong></td>
             <td>{{ a.team || '—' }}</td>
+            <td style="color:#64748b">{{ a.goals }}</td>
+            <td style="color:#64748b">{{ a.goals_offset }}</td>
             <td>
-              <span class="gols-badge">⚽ {{ a.goals }}</span>
+              <span class="gols-badge">⚽ {{ a.effective_goals }}</span>
             </td>
             <td>
               <div class="table-actions">
@@ -55,7 +66,7 @@
             </td>
           </tr>
           <tr v-if="artilheiros.length === 0">
-            <td colspan="4" style="text-align:center;color:#888;padding:20px">Nenhum artilheiro cadastrado.</td>
+            <td colspan="6" style="text-align:center;color:#888;padding:20px">Nenhum artilheiro cadastrado.</td>
           </tr>
         </tbody>
       </table>
@@ -86,15 +97,15 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import api from '../../api'
 
-const artilheiros   = ref([])
-const choices       = ref([])
-const loading       = ref(true)
+const artilheiros    = ref([])
+const choices        = ref([])
+const loading        = ref(true)
 const loadingChoices = ref(true)
-const saving        = ref(false)
-const formError     = ref('')
-const editing       = ref(null)
+const saving         = ref(false)
+const formError      = ref('')
+const editing        = ref(null)
 
-const form = reactive({ name: '', team: '', goals: 0 })
+const form = reactive({ name: '', team: '', goals: 0, goals_offset: 0 })
 
 const choiceGroups = computed(() => {
   const map = {}
@@ -143,15 +154,16 @@ async function submit() {
 }
 
 function startEdit(a) {
-  editing.value = a.id
-  form.name  = a.name
-  form.team  = a.team || ''
-  form.goals = a.goals
+  editing.value       = a.id
+  form.name           = a.name
+  form.team           = a.team || ''
+  form.goals          = a.goals
+  form.goals_offset   = a.goals_offset
 }
 
 function cancelEdit() {
   editing.value = null
-  form.name = ''; form.team = ''; form.goals = 0
+  form.name = ''; form.team = ''; form.goals = 0; form.goals_offset = 0
 }
 
 async function remove(a) {

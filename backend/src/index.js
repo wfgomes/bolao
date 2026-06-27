@@ -2,6 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const db = require('./config/db');
+
+async function migrate() {
+  await db.query(`
+    ALTER TABLE artilheiros
+      ADD COLUMN IF NOT EXISTS goals_offset INTEGER NOT NULL DEFAULT 0
+  `);
+}
 
 const app = express();
 
@@ -23,6 +31,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(dist));
   app.get('*', (req, res) => res.sendFile(path.join(dist, 'index.html')));
 }
-require('./autoUpdate');
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+migrate().then(() => {
+  require('./autoUpdate');
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+}).catch(e => { console.error('Migrate error:', e); process.exit(1); });
