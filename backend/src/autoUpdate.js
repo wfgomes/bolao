@@ -140,27 +140,26 @@ async function atualizarJogos() {
     const { homeScore, awayScore, status } = resultado;
     if (homeScore === null || awayScore === null) continue;
 
-    // Só atualiza se mudou
-    if (jogo.home_score === homeScore && jogo.away_score === awayScore && jogo.status === status) continue;
+    // Atualiza placar se mudou
+    if (jogo.home_score !== homeScore || jogo.away_score !== awayScore) {
+      await axios.put(
+        `${BACKEND_URL}/admin/games/${jogo.id}/result`,
+        { home_score: homeScore, away_score: awayScore },
+        { headers: headers() }
+      );
+      atualizados++;
+      console.log(`Placar: ${jogo.home_team} ${homeScore}x${awayScore} ${jogo.away_team}`);
+    }
 
-    // Atualiza placar
-    await axios.put(
-      `${BACKEND_URL}/admin/games/${jogo.id}/result`,
-      { home_score: homeScore, away_score: awayScore },
-      { headers: headers() }
-    );
-
-    // Finaliza se necessário
-    if (status === 'FZ') {
+    // Finaliza sempre que API disser FINISHED e jogo ainda não estiver FZ
+    if (status === 'FZ' && jogo.status !== 'FZ') {
       await axios.put(
         `${BACKEND_URL}/admin/games/${jogo.id}/finalizar`,
         {},
         { headers: headers() }
       );
+      console.log(`Finalizado: ${jogo.home_team} x ${jogo.away_team}`);
     }
-
-    console.log(`Atualizado: ${jogo.home_team} ${homeScore}x${awayScore} ${jogo.away_team} [${status}]`);
-    atualizados++;
   }
 
   console.log(`Jogos atualizados: ${atualizados}`);
