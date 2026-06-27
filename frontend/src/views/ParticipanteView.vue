@@ -64,7 +64,7 @@
 
           <div class="pred-result-row">
             <!-- Resultado do jogo -->
-            <template v-if="pred.game_status === 'EA'">
+            <template v-if="pred.game_status === 'EA' || pred.game_status === 'IN'">
               <span class="live-badge">🔴 Ao vivo {{ pred.game_home }} × {{ pred.game_away }}</span>
             </template>
             <template v-else-if="pred.game_status === 'FZ'">

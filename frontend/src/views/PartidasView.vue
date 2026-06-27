@@ -16,11 +16,11 @@
 
         <div v-for="g in ph.games" :key="g.id" class="match-card">
           <!-- Placar -->
-          <div class="match-score-row" :class="{ live: g.status === 'EA' }">
+          <div class="match-score-row" :class="{ live: g.status === 'EA' || g.status === 'IN' }">
             <span class="match-team">{{ g.home_team }}</span>
             <div class="match-score-col">
               <span class="match-score">{{ g.home_score }} × {{ g.away_score }}</span>
-              <span v-if="g.status === 'EA'" class="live-tag">🔴 Ao vivo</span>
+              <span v-if="g.status === 'EA' || g.status === 'IN'" class="live-tag">🔴 Ao vivo</span>
             </div>
             <span class="match-team away">{{ g.away_team }}</span>
           </div>

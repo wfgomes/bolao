@@ -92,7 +92,7 @@
             <span class="team-name away">{{ game.away_team }}</span>
           </div>
 
-          <div v-if="game.status === 'EA'" class="game-result live-result">
+          <div v-if="game.status === 'EA' || game.status === 'IN'" class="game-result live-result">
             <span class="live-badge">🔴 Ao vivo</span>
             <span class="result-label">{{ game.home_score }} × {{ game.away_score }}</span>
             <span v-if="game.prediction?.points != null" class="badge" :class="ptsClass(game.prediction.points)">

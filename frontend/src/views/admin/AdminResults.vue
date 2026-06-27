@@ -21,7 +21,7 @@
               <span class="r-team away">{{ g.away_team }}</span>
             </div>
             <div class="result-badges">
-              <span v-if="g.status === 'EA'" class="badge-live">🔴 Ao vivo</span>
+              <span v-if="g.status === 'EA' || g.status === 'IN'" class="badge-live">🔴 Ao vivo</span>
               <span v-else-if="g.status === 'FZ'" class="badge badge-open">✅ Finalizado</span>
               <span v-else class="badge badge-inactive">⏳ Pendente</span>
               <span v-if="g.game_datetime" class="game-date">{{ fmtDate(g.game_datetime) }}</span>
@@ -40,11 +40,11 @@
               class="btn btn-warning btn-sm"
               :disabled="busy[g.id]"
             >
-              {{ g.status === 'EA' ? '🔄 Atualizar' : '▶ Em Andamento' }}
+              {{ g.status === 'EA' || g.status === 'IN' ? '🔄 Atualizar' : '▶ Em Andamento' }}
             </button>
 
             <button
-              v-if="g.status === 'EA'"
+              v-if="g.status === 'EA' || g.status === 'IN'"
               @click="finalizar(g)"
               class="btn btn-success btn-sm"
               :disabled="busy[g.id]"
@@ -53,7 +53,7 @@
             </button>
 
             <button
-              v-if="g.status === 'EA' || g.status === 'FZ'"
+              v-if="g.status === 'EA' || g.status === 'IN' || g.status === 'FZ'"
               @click="cancelar(g)"
               class="btn btn-danger btn-sm"
               :disabled="busy[g.id]"
