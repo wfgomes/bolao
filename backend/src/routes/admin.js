@@ -198,13 +198,17 @@ router.put('/games/:id/result', async (req, res) => {
   }
 });
 
-// Finaliza jogo → status FZ
+// Finaliza jogo → status FZ, recalcula pontos com placar final
 router.put('/games/:id/finalizar', async (req, res) => {
   try {
-    await db.query(
-      'UPDATE games SET status = $1, is_finished = TRUE WHERE id = $2',
+    const { rows } = await db.query(
+      'UPDATE games SET status = $1, is_finished = TRUE WHERE id = $2 RETURNING home_score, away_score',
       ['FZ', req.params.id]
     );
+    const { home_score, away_score } = rows[0] || {};
+    if (home_score !== null && away_score !== null && home_score !== undefined) {
+      await recalcPoints(req.params.id, home_score, away_score);
+    }
     res.json({ success: true });
   } catch (e) {
     res.status(500).json({ error: 'Erro ao finalizar jogo' });
