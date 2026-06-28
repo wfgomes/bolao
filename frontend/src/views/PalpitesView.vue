@@ -19,8 +19,8 @@
       </div>
 
       <div v-if="artData.is_locked && artData.user_choice" class="art-goals">
-        ⚽ {{ artData.user_choice.goals }} gol{{ artData.user_choice.goals !== 1 ? 's' : '' }}
-        → <strong>+{{ artData.user_choice.goals }} pts</strong>
+        ⚽ {{ artData.user_choice.effective_goals }} gol{{ artData.user_choice.effective_goals !== 1 ? 's' : '' }}
+        → <strong>+{{ artData.user_choice.effective_goals }} pts</strong>
       </div>
 
       <div v-if="!artData.is_locked" style="margin-top:12px">
