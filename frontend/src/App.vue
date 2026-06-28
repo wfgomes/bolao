@@ -32,6 +32,7 @@
           <router-link to="/">🏆 Classificação</router-link>
           <router-link to="/palpites">⚽ Meus Palpites</router-link>
           <router-link to="/partidas">📊 Acertos</router-link>
+          <router-link to="/regulamento">📜 Regulamento</router-link>
         </template>
         <template v-else>
           <router-link to="/admin/jogos">Jogos</router-link>
@@ -63,6 +64,10 @@
       <router-link to="/partidas" class="bnav-item">
         <span class="bnav-icon">📊</span>
         <span>Acertos</span>
+      </router-link>
+      <router-link to="/regulamento" class="bnav-item">
+        <span class="bnav-icon">📜</span>
+        <span>Regras</span>
       </router-link>
     </nav>
 

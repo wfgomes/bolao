@@ -13,6 +13,7 @@ const routes = [
   { path: '/partidas',             component: () => import('../views/PartidasView.vue') },
   { path: '/participante/:userId', component: () => import('../views/ParticipanteView.vue') },
   { path: '/perfil',               component: () => import('../views/PerfilView.vue') },
+  { path: '/regulamento',          component: () => import('../views/RegulamentoView.vue') },
   {
     path: '/admin',
     component: () => import('../views/admin/AdminLayout.vue'),
