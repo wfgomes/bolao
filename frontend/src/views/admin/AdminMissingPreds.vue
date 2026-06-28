@@ -15,7 +15,6 @@
               <th v-for="ph in phases" :key="ph.phase_id" class="col-phase">
                 {{ ph.phase_display }}
               </th>
-              <th class="col-total">Total faltando</th>
             </tr>
           </thead>
           <tbody>
@@ -28,9 +27,6 @@
                 :class="cellClass(u.user_id, ph.phase_id)"
               >
                 {{ cellLabel(u.user_id, ph.phase_id) }}
-              </td>
-              <td class="col-total total-cell" :class="totalClass(u.user_id)">
-                {{ totalMissing(u.user_id) }}
               </td>
             </tr>
           </tbody>
