@@ -16,6 +16,7 @@
             <span class="name">{{ p.name }}</span>
             <span class="pts">{{ p.points }} <small>pts</small></span>
             <span class="detail">🎯{{ p.exact_scores }} ✅{{ p.correct_outcomes }} ❌{{ p.wrong }}</span>
+            <span v-if="p.artilheiro_name" class="detail art-detail">⚽ {{ p.artilheiro_name }} ({{ p.artilheiro_effective_goals }})</span>
             <span class="expand-icon">{{ expandedId === p.id ? '▲' : '▼' }}</span>
           </div>
 
@@ -183,6 +184,7 @@ function ptsLabel(pts) {
 .pts  { font-size: 17px; font-weight: bold; color: #198754; white-space: nowrap; }
 .pts small { font-size: 11px; color: #888; font-weight: normal; }
 .detail { font-size: 12px; color: #888; white-space: nowrap; }
+.art-detail { color: #16a34a; }
 .expand-icon { font-size: 11px; color: #aaa; }
 
 .user-preds-panel {

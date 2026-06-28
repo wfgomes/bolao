@@ -26,7 +26,7 @@
             <span class="rank-stat">✅ {{ p.correct_outcomes }}</span>
             <span class="rank-stat">❌ {{ p.wrong }}</span>
             <span v-if="p.artilheiro_name" class="rank-art">
-              ⚽ {{ p.artilheiro_name }} ({{ p.artilheiro_goals }})
+              ⚽ {{ p.artilheiro_name }} ({{ p.artilheiro_effective_goals }})
             </span>
           </div>
         </div>
