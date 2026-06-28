@@ -43,7 +43,8 @@ router.get('/:userId', authMiddleware, async (req, res) => {
     `, [userId, phaseIds]);
 
     const { rows: artRow } = await db.query(`
-      SELECT a.name AS artilheiro_name, a.team, a.goals
+      SELECT a.name AS artilheiro_name, a.team, a.goals, a.goals_offset,
+             GREATEST(a.goals - a.goals_offset, 0) AS effective_goals
       FROM user_artilheiro ua
       JOIN artilheiros a ON ua.artilheiro_id = a.id
       WHERE ua.user_id = $1
@@ -53,7 +54,7 @@ router.get('/:userId', authMiddleware, async (req, res) => {
     const { rows: pts } = await db.query(`
       SELECT
         (COALESCE(SUM(pr.points), 0) + COALESCE(
-          (SELECT a.goals FROM user_artilheiro ua
+          (SELECT GREATEST(a.goals - a.goals_offset, 0) FROM user_artilheiro ua
            JOIN artilheiros a ON ua.artilheiro_id = a.id
            WHERE ua.user_id = $1 LIMIT 1), 0
         ))::int AS points,

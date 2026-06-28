@@ -40,7 +40,7 @@
           <span class="art-label">⚽ Artilheiro:</span>
           <span class="art-name">{{ data.artilheiro.artilheiro_name }}</span>
           <span v-if="data.artilheiro.team" class="art-team">{{ data.artilheiro.team }}</span>
-          <span class="art-goals">{{ data.artilheiro.goals }} gol{{ data.artilheiro.goals !== 1 ? 's' : '' }} → +{{ data.artilheiro.goals }}pts</span>
+          <span class="art-goals">{{ data.artilheiro.effective_goals }} gol{{ data.artilheiro.effective_goals !== 1 ? 's' : '' }} → +{{ data.artilheiro.effective_goals }}pts</span>
         </div>
       </div>
 
