@@ -43,7 +43,7 @@ onMounted(async () => {
       api.get(`/predictions/phase/${route.params.phaseId}`),
       api.get('/games/phases'),
     ])
-    groups.value    = pRes.data
+    groups.value    = pRes.data.sort((a, b) => a.user_name.localeCompare(b.user_name, 'pt'))
     const ph        = phRes.data.find(p => p.id == route.params.phaseId)
     phaseName.value = ph?.display_name || 'Palpites'
   } catch (e) {
