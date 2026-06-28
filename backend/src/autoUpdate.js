@@ -3,7 +3,7 @@ const axios = require('axios');
 const API_KEY = 'd8f11bedecf64f2c84190bd2a40a24be';
 const BACKEND_URL = 'https://bolao-backend-cl0j.onrender.com/api';
 const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'admin123';
+const ADMIN_PASS = 'admin@123';
 
 const TEAM_MAP = {
   'México': 'Mexico',
