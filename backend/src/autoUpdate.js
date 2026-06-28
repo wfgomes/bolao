@@ -5,7 +5,6 @@ const BACKEND_URL = 'https://bolao-backend-cl0j.onrender.com/api';
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'admin123';
 
-// Mapa: nome no banco → nome na API football-data.org
 const TEAM_MAP = {
   'México': 'Mexico',
   'África do Sul': 'South Africa',
@@ -40,6 +39,7 @@ const TEAM_MAP = {
   'Uruguai': 'Uruguay',
   'Arábia Saudita': 'Saudi Arabia',
   'Cabo Verde': 'Cape Verde Islands',
+  'Cabo verde': 'Cape Verde Islands',
   'França': 'France',
   'Senegal': 'Senegal',
   'Noruega': 'Norway',
@@ -58,21 +58,20 @@ const TEAM_MAP = {
   'Gana': 'Ghana',
 };
 
-// Mapa: nome no banco → nome na API football-data.org
 const ARTILHEIRO_MAP = {
-  'Mbappé':          'Kylian Mbappé',
-  'Neymar':          'Neymar',
-  'Kai Havertz':     'Kai Havertz',
-  'Erling Haaland':  'Erling Haaland',
+  'Mbappé':            'Kylian Mbappé',
+  'Neymar':            'Neymar',
+  'Kai Havertz':       'Kai Havertz',
+  'Erling Haaland':    'Erling Haaland',
   'Cristiano Ronaldo': 'Cristiano Ronaldo',
-  'Kane':            'Harry Kane',
-  'Vini Jr':         'Vinicius Junior',
-  'Messi':           'Lionel Messi',
-  'Olise':           'Michael Olise',
-  'Lautaro Martínez': 'Lautaro Martínez',
-  'Julian Álvarez':  'Julián Álvarez',
-  'Enner Valencia':  'Enner Valencia',
-  'Dembélé': 'Ousmane Dembélé'
+  'Kane':              'Harry Kane',
+  'Vini Jr':           'Vinicius Junior',
+  'Messi':             'Lionel Messi',
+  'Olise':             'Michael Olise',
+  'Lautaro Martínez':  'Lautaro Martínez',
+  'Julian Álvarez':    'Julián Álvarez',
+  'Enner Valencia':    'Enner Valencia',
+  'Dembélé':           'Ousmane Dembélé',
 };
 
 const STATUS_MAP = {
@@ -96,8 +95,34 @@ function headers() {
   return { Authorization: `Bearer ${token}` };
 }
 
+// Retorna placar do tempo regulamentar, independente de prorrogação/pênaltis
+function getPlacarRegular(match) {
+  const duration = match.score.duration;
+
+  // Se terminou no tempo regular, usa fullTime normalmente
+  if (duration === 'REGULAR') {
+    return {
+      home: match.score.fullTime.home,
+      away: match.score.fullTime.away,
+    };
+  }
+
+  // Se foi para prorrogação ou pênaltis, usa regularTime
+  if (match.score.regularTime?.home !== null && match.score.regularTime?.home !== undefined) {
+    return {
+      home: match.score.regularTime.home,
+      away: match.score.regularTime.away,
+    };
+  }
+
+  // Fallback: usa halfTime como base (jogo ainda no intervalo da prorrogação)
+  return {
+    home: match.score.fullTime.home,
+    away: match.score.fullTime.away,
+  };
+}
+
 async function atualizarJogos() {
-  // 1. Busca jogos em andamento/finalizados na API
   const { data } = await axios.get(
     'https://api.football-data.org/v4/competitions/WC/matches?status=IN_PLAY,PAUSED,FINISHED',
     { headers: { 'X-Auth-Token': API_KEY } }
@@ -108,23 +133,24 @@ async function atualizarJogos() {
     return;
   }
 
-  // Monta mapa: "HomeAPI|AwayAPI" → { homeScore, awayScore, status }
+  // Monta mapa de resultados usando placar do tempo regulamentar
   const resultadosAPI = {};
   for (const match of data.matches) {
     const chave = `${match.homeTeam.name}|${match.awayTeam.name}`;
+    const placar = getPlacarRegular(match);
     resultadosAPI[chave] = {
-      homeScore: match.score.fullTime.home,
-      awayScore: match.score.fullTime.away,
+      homeScore: placar.home,
+      awayScore: placar.away,
       status: STATUS_MAP[match.status] || match.status,
+      duration: match.score.duration,
     };
   }
 
-  // 2. Busca jogos do nosso backend
   const { data: jogos } = await axios.get(`${BACKEND_URL}/admin/games`, { headers: headers() });
 
   let atualizados = 0;
   for (const jogo of jogos) {
-    if (jogo.is_finished) continue; // não sobrescreve jogos finalizados manualmente
+    if (jogo.is_finished) continue;
 
     const homeAPI = TEAM_MAP[jogo.home_team];
     const awayAPI = TEAM_MAP[jogo.away_team];
@@ -138,8 +164,15 @@ async function atualizarJogos() {
     const resultado = resultadosAPI[chave];
     if (!resultado) continue;
 
-    const { homeScore, awayScore, status } = resultado;
+    const { homeScore, awayScore, status, duration } = resultado;
     if (homeScore === null || awayScore === null) continue;
+
+    // Não atualiza placar se jogo está em prorrogação ou pênaltis
+    // (aguarda finalizar para pegar o placar do tempo regular correto)
+    if (status === 'EA' && (duration === 'EXTRA_TIME' || duration === 'PENALTY_SHOOTOUT')) {
+      console.log(`Aguardando fim da prorrogação/pênaltis: ${jogo.home_team} x ${jogo.away_team}`);
+      continue;
+    }
 
     // Atualiza placar se mudou
     if (jogo.home_score !== homeScore || jogo.away_score !== awayScore) {
@@ -149,17 +182,17 @@ async function atualizarJogos() {
         { headers: headers() }
       );
       atualizados++;
-      console.log(`Placar: ${jogo.home_team} ${homeScore}x${awayScore} ${jogo.away_team}`);
+      console.log(`Placar: ${jogo.home_team} ${homeScore}x${awayScore} ${jogo.away_team} [${duration}]`);
     }
 
-    // Finaliza sempre que API disser FINISHED e jogo ainda não estiver FZ
+    // Finaliza quando jogo terminar (qualquer duração — placar já é do tempo regular)
     if (status === 'FZ' && jogo.status !== 'FZ') {
       await axios.put(
         `${BACKEND_URL}/admin/games/${jogo.id}/finalizar`,
         {},
         { headers: headers() }
       );
-      console.log(`Finalizado: ${jogo.home_team} x ${jogo.away_team}`);
+      console.log(`Finalizado: ${jogo.home_team} x ${jogo.away_team} [${duration}]`);
     }
   }
 
@@ -167,7 +200,6 @@ async function atualizarJogos() {
 }
 
 async function atualizarArtilheiros() {
-  // Busca artilheiros da API
   const { data } = await axios.get(
     'https://api.football-data.org/v4/competitions/WC/scorers?limit=50',
     { headers: { 'X-Auth-Token': API_KEY } }
@@ -175,13 +207,11 @@ async function atualizarArtilheiros() {
 
   if (!data.scorers || data.scorers.length === 0) return;
 
-  // Monta mapa: nome API → gols
   const golsMap = {};
   for (const scorer of data.scorers) {
     golsMap[scorer.player.name] = scorer.goals || 0;
   }
 
-  // Busca artilheiros do backend
   const { data: artilheiros } = await axios.get(
     `${BACKEND_URL}/admin/artilheiros`,
     { headers: headers() }
@@ -213,17 +243,17 @@ async function atualizarArtilheiros() {
 
 async function executar() {
   try {
-    await login();
+    if (!token) await login();
     await atualizarJogos();
     await atualizarArtilheiros();
   } catch (e) {
     console.error('Erro:', e.message);
-    // Se token expirou, faz login novamente na próxima execução
-    if (e.response?.status === 401) token = null;
+    if (e.response?.status === 401) {
+      token = null; // força novo login na próxima execução
+    }
   }
 }
 
-// Roda imediatamente e depois a cada 1 minuto
 executar();
 setInterval(executar, 60 * 1000);
 
