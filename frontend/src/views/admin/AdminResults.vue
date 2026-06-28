@@ -10,7 +10,7 @@
 
         <div v-for="g in phaseGroup.games" :key="g.id" class="result-card">
           <!-- Header: times + status -->
-          <div class="result-header">
+          <div class="result-header" @click="toggleSummary(g)" style="cursor:pointer">
             <div class="result-teams-row">
               <span class="r-team">{{ g.home_team }}</span>
               <div class="r-inputs">
@@ -25,7 +25,24 @@
               <span v-else-if="g.status === 'FZ'" class="badge badge-open">✅ Finalizado</span>
               <span v-else class="badge badge-inactive">⏳ Pendente</span>
               <span v-if="g.game_datetime" class="game-date">{{ fmtDate(g.game_datetime) }}</span>
+              <span class="toggle-icon">{{ expandedId === g.id ? '▲' : '▼' }}</span>
             </div>
+          </div>
+
+          <!-- Resumo de palpites -->
+          <div v-if="expandedId === g.id" class="summary-panel">
+            <div v-if="loadingSummary" style="color:#888;font-size:12px">Carregando...</div>
+            <template v-else-if="summary.length">
+              <div class="summary-row" v-for="s in summary" :key="s.home_score + 'x' + s.away_score">
+                <span class="summary-score">{{ s.home_score }} × {{ s.away_score }}</span>
+                <span class="summary-bar-wrap">
+                  <span class="summary-bar" :style="{ width: barWidth(s.count) + '%' }"></span>
+                </span>
+                <span class="summary-count">{{ s.count }} pessoa{{ s.count !== 1 ? 's' : '' }}</span>
+                <span class="summary-users">{{ s.users }}</span>
+              </div>
+            </template>
+            <div v-else style="color:#888;font-size:12px">Nenhum palpite cadastrado.</div>
           </div>
 
           <!-- Mensagem de status -->
@@ -75,11 +92,14 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import api from '../../api'
 
-const games     = ref([])
-const loading   = ref(true)
-const busy      = reactive({})
-const statusMsg = reactive({})
-const scores    = reactive({})
+const games          = ref([])
+const loading        = ref(true)
+const busy           = reactive({})
+const statusMsg      = reactive({})
+const scores         = reactive({})
+const expandedId     = ref(null)
+const summary        = ref([])
+const loadingSummary = ref(false)
 
 const grouped = computed(() => {
   const map = {}
@@ -136,6 +156,23 @@ async function exec(id, fn, successMsg) {
 
 function setMsg(id, cls, msg) { statusMsg[id] = { cls, msg } }
 
+async function toggleSummary(g) {
+  if (expandedId.value === g.id) { expandedId.value = null; return }
+  expandedId.value = g.id
+  summary.value = []
+  loadingSummary.value = true
+  try {
+    const { data } = await api.get(`/admin/games/${g.id}/prediction-summary`)
+    summary.value = data
+  } catch (e) { console.error(e) }
+  finally { loadingSummary.value = false }
+}
+
+function barWidth(count) {
+  const max = Math.max(...summary.value.map(s => s.count), 1)
+  return Math.round((count / max) * 100)
+}
+
 function fmtDate(dt) {
   return new Date(dt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
@@ -178,4 +215,24 @@ function fmtDate(dt) {
 .game-date { font-size: 11px; color: #94a3b8; }
 
 .result-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.toggle-icon { font-size: 11px; color: #aaa; margin-left: auto; }
+
+.summary-panel {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #f8faff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+}
+.summary-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 0; border-bottom: 1px solid #eef2ff; font-size: 13px;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-score { font-weight: 700; color: #1d4ed8; min-width: 52px; text-align: center; }
+.summary-bar-wrap { flex: 1; background: #e2e8f0; border-radius: 4px; height: 10px; overflow: hidden; }
+.summary-bar { display: block; height: 100%; background: #1d4ed8; border-radius: 4px; transition: width .3s; }
+.summary-count { font-weight: 600; color: #374151; white-space: nowrap; min-width: 70px; text-align: right; }
+.summary-users { font-size: 11px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
 </style>

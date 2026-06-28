@@ -229,6 +229,25 @@ router.delete('/games/:id/result', async (req, res) => {
   }
 });
 
+// Resumo de palpites por placar para um jogo
+router.get('/games/:id/prediction-summary', async (req, res) => {
+  try {
+    const { rows } = await db.query(`
+      SELECT
+        pr.home_score,
+        pr.away_score,
+        COUNT(*)::int AS count,
+        STRING_AGG(u.name, ', ' ORDER BY u.name) AS users
+      FROM predictions pr
+      JOIN users u ON pr.user_id = u.id
+      WHERE pr.game_id = $1
+      GROUP BY pr.home_score, pr.away_score
+      ORDER BY count DESC, pr.home_score, pr.away_score
+    `, [req.params.id]);
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: 'Erro' }); }
+});
+
 // ── Predictions (admin view) ───────────────────────────────────────────
 router.get('/predictions', async (req, res) => {
   const { phase_id, user_id } = req.query;
