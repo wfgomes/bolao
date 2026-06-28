@@ -21,6 +21,7 @@
       <router-link to="/admin/usuarios"     @click="menuOpen = false">👥 Usuários</router-link>
       <router-link to="/admin/classificacao" @click="menuOpen = false">🏆 Classificação</router-link>
       <router-link to="/admin/artilheiros"  @click="menuOpen = false">🥇 Artilheiros</router-link>
+      <router-link to="/admin/palpites-faltando" @click="menuOpen = false">📋 Faltando</router-link>
       <router-link to="/partidas"           @click="menuOpen = false">📊 Acertos</router-link>
     </nav>
 
@@ -39,6 +40,7 @@
           <router-link to="/admin/usuarios">Usuários</router-link>
           <router-link to="/admin/classificacao">Classificação</router-link>
           <router-link to="/admin/artilheiros">Artilheiros</router-link>
+          <router-link to="/admin/palpites-faltando">Faltando</router-link>
           <router-link to="/partidas">📊 Acertos</router-link>
         </template>
       </div>

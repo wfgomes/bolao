@@ -281,6 +281,32 @@ router.get('/standings', async (req, res) => {
   } catch (e) { res.status(500).json({ error: 'Erro' }); }
 });
 
+// ── Palpites faltando por usuário/fase ───────────────────────────────
+router.get('/missing-predictions', async (req, res) => {
+  try {
+    const { rows } = await db.query(`
+      SELECT
+        u.id          AS user_id,
+        u.name        AS user_name,
+        p.id          AS phase_id,
+        p.display_name AS phase_display,
+        p.order_num,
+        COUNT(g.id)::int                    AS total_games,
+        COUNT(pr.id)::int                   AS predictions_made,
+        (COUNT(g.id) - COUNT(pr.id))::int   AS missing
+      FROM users u
+      CROSS JOIN phases p
+      JOIN games g ON g.phase_id = p.id
+      LEFT JOIN predictions pr ON pr.game_id = g.id AND pr.user_id = u.id
+      WHERE u.active = TRUE AND u.is_admin = FALSE
+      GROUP BY u.id, u.name, p.id, p.display_name, p.order_num
+      HAVING COUNT(g.id) > 0
+      ORDER BY u.name, p.order_num
+    `);
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: 'Erro' }); }
+});
+
 // ── Artilheiros (admin) ───────────────────────────────────────────────
 router.get('/artilheiros', async (req, res) => {
   try {

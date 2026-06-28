@@ -25,6 +25,7 @@ const routes = [
       { path: 'resultados', component: () => import('../views/admin/AdminResults.vue') },
       { path: 'classificacao', component: () => import('../views/admin/AdminStandings.vue') },
       { path: 'artilheiros',  component: () => import('../views/admin/AdminArtilheiros.vue') },
+      { path: 'palpites-faltando', component: () => import('../views/admin/AdminMissingPreds.vue') },
     ],
   },
   { path: '/:pathMatch(.*)*', redirect: '/' },
