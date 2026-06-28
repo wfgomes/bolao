@@ -5,6 +5,7 @@
       <span class="header-brand">⚽ Bolão dos Amigos</span>
       <div class="header-right">
         <router-link to="/perfil" class="header-user">{{ auth.user?.name }}</router-link>
+        <router-link v-if="!auth.isAdmin" to="/perfil" class="btn-senha">🔑 Senha</router-link>
         <!-- Hamburguer: só mobile + admin -->
         <button v-if="auth.isAdmin" class="btn-hamburger" @click.stop="menuOpen = !menuOpen" :class="{ active: menuOpen }">
           <span></span><span></span><span></span>

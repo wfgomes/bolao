@@ -54,6 +54,15 @@ body {
   white-space: nowrap;
 }
 .btn-logout:hover { background: rgba(255,255,255,.25); }
+.btn-senha {
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  color: white; text-decoration: none;
+  font-size: 12px; font-weight: 600;
+  padding: 5px 10px; border-radius: 8px;
+  white-space: nowrap;
+}
+.btn-senha:hover { background: rgba(255,255,255,.25); }
 
 /* ── App wrapper ─────────────────────────────────────── */
 .app-wrapper { position: relative; }
