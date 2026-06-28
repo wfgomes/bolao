@@ -56,7 +56,7 @@
 
     <div class="card">
       <h2 class="section-title">Ver palpites por fase</h2>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
         <button
           v-for="ph in phases"
           :key="ph.id"
@@ -70,7 +70,12 @@
     </div>
 
     <div v-if="selectedPhase" class="card">
-      <h2 class="section-title">Palpites — {{ selectedPhase.display_name }}</h2>
+      <div class="phase-header">
+        <h2 class="section-title">Palpites — {{ selectedPhase.display_name }}</h2>
+        <button class="btn btn-sm btn-print" :disabled="loadingPreds" @click="printPhase">
+          🖨️ Imprimir fase
+        </button>
+      </div>
       <div v-if="loadingPreds" style="color:#888">Carregando...</div>
       <div v-else>
         <div v-for="g in groups" :key="g.user_id" style="margin-bottom:20px">
@@ -120,12 +125,11 @@ async function toggleUser(p) {
     return
   }
   expandedId.value = p.id
-  if (userPreds[p.id]) return // já carregado
+  if (userPreds[p.id]) return
 
   loadingUser.value = true
   try {
     const { data } = await api.get(`/admin/predictions?user_id=${p.id}`)
-    // Agrupa por fase
     const phaseMap = {}
     data.forEach(pred => {
       const ph = pred.phase_display
@@ -148,9 +152,57 @@ async function loadPreds(ph) {
       if (!map[r.user_id]) map[r.user_id] = { user_id: r.user_id, user_name: r.user_name, predictions: [] }
       map[r.user_id].predictions.push(r)
     })
-    groups.value = Object.values(map)
+    groups.value = Object.values(map).sort((a, b) => a.user_name.localeCompare(b.user_name, 'pt'))
   } catch (e) { console.error(e) }
   finally { loadingPreds.value = false }
+}
+
+function printPhase() {
+  const userRows = groups.value.map(u => {
+    const rows = u.predictions.map(pr =>
+      `<tr>
+        <td class="team right">${pr.home_team}</td>
+        <td class="score">${pr.home_score} × ${pr.away_score}</td>
+        <td class="team">${pr.away_team}</td>
+      </tr>`
+    ).join('')
+    return `<div class="user-block">
+      <div class="user-name">${u.user_name}</div>
+      <table><tbody>${rows}</tbody></table>
+    </div>`
+  }).join('')
+
+  const html = `<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Palpites — ${selectedPhase.value.display_name}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 11px; color: #111; padding: 16px; }
+    h1 { font-size: 15px; margin-bottom: 4px; text-align: center; }
+    h2 { font-size: 12px; text-align: center; color: #555; margin-bottom: 14px; }
+    .user-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .user-block { border: 1px solid #ddd; border-radius: 4px; padding: 6px 8px; min-width: 180px; page-break-inside: avoid; }
+    .user-name { font-weight: bold; color: #1d4ed8; margin-bottom: 4px; font-size: 11px; }
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 2px 4px; font-size: 10px; }
+    td.score { text-align: center; font-weight: bold; color: #1d4ed8; white-space: nowrap; }
+    td.team { font-weight: bold; }
+    td.right { text-align: right; }
+  </style>
+</head>
+<body>
+  <h1>⚽ Palpites do Bolão</h1>
+  <h2>${selectedPhase.value.display_name}</h2>
+  <div class="user-grid">${userRows}</div>
+  <script>window.onload = () => { window.print(); }<\/script>
+</body>
+</html>`
+
+  const win = window.open('', '_blank')
+  win.document.write(html)
+  win.document.close()
 }
 
 function ptsClass(pts) {
@@ -216,4 +268,17 @@ function ptsLabel(pts) {
   font-weight: bold; font-size: 14px; color: #0d6efd;
   background: #e8f0fe; padding: 5px 12px; border-radius: 6px; margin-bottom: 6px;
 }
+
+.phase-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.phase-header .section-title { margin: 0; }
+
+.btn-print {
+  background: #1d4ed8; color: #fff; border: none;
+  padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+  white-space: nowrap;
+}
+.btn-print:hover:not(:disabled) { background: #1e40af; }
+.btn-print:disabled { opacity: .6; cursor: default; }
 </style>
